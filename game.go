@@ -2,6 +2,7 @@ package codenames
 
 import (
 	"encoding/json"
+	"errors"
 	"math/rand"
 
 	"github.com/satori/go.uuid"
@@ -43,12 +44,47 @@ func (t Team) Repeat(n int) []Team {
 }
 
 type Game struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	StartingTeam Team     `json:"starting_team"`
-	Round        int      `json:"round"`
-	Words        []string `json:"words"`
-	Layout       []Team   `json:"layout"`
+	ID           string             `json:"id"`
+	Name         string             `json:"name"`
+	StartingTeam Team               `json:"starting_team"`
+	Round        int                `json:"round"`
+	Words        []string           `json:"words"`
+	Layout       []Team             `json:"layout"`
+	Players      map[string]*Player `json:"players"`
+	Codemaster   map[Team]*Player   `json:"codemaster"`
+}
+
+func (g *Game) AddPlayer(p *Player, codemaster bool) error {
+	if g.Round > 0 {
+		return errors.New("That game has already started.")
+	}
+
+	if p.ID == "" {
+		p.ID = uuid.NewV4().String()
+	}
+
+	g.Players[p.ID] = p
+
+	if codemaster && p.Team != Neutral {
+		g.Codemaster[p.Team] = p
+	}
+	return nil
+}
+
+func (g *Game) CurrentTeam() Team {
+	if g.Round%2 == 0 {
+		return g.StartingTeam
+	}
+	if g.StartingTeam == Red {
+		return Blue
+	}
+	return Red
+}
+
+type Player struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name"`
+	Team Team   `json:"team"`
 }
 
 func newGame(name string, words []string) *Game {
@@ -58,6 +94,8 @@ func newGame(name string, words []string) *Game {
 		StartingTeam: Team(rand.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
+		Codemaster:   make(map[Team]*Player),
+		Players:      make(map[string]*Player),
 	}
 
 	// Pick 25 random words.
