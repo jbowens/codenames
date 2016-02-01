@@ -86,6 +86,65 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
+// POST /guess
+func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var request struct {
+		GameID   string `json:"game_id"`
+		PlayerID string `json:"player_id"`
+		Index    int    `json:"index"`
+	}
+
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&request); err != nil {
+		http.Error(rw, "Error decoding", 400)
+		return
+	}
+
+	g, ok := s.games[request.GameID]
+	if !ok {
+		http.Error(rw, "No such game", 404)
+		return
+	}
+
+	if err := g.Guess(request.Index); err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	writeJSON(rw, g)
+}
+
+// POST /clue
+func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var request struct {
+		GameID string `json:"game_id"`
+		Clue   Clue   `json:"clue"`
+	}
+
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&request); err != nil {
+		http.Error(rw, "Error decoding", 400)
+		return
+	}
+
+	g, ok := s.games[request.GameID]
+	if !ok {
+		http.Error(rw, "No such game", 404)
+		return
+	}
+
+	if err := g.ProvideClue(request.Clue); err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	writeJSON(rw, g)
+}
+
 func (s *Server) Start() error {
 	d, err := dictionary.Default()
 	if err != nil {

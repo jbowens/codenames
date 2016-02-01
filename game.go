@@ -3,7 +3,9 @@ package codenames
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/rand"
+	"strings"
 
 	"github.com/satori/go.uuid"
 )
@@ -18,6 +20,7 @@ const (
 	Neutral Team = iota
 	Red
 	Blue
+	Black
 )
 
 func (t Team) String() string {
@@ -26,9 +29,21 @@ func (t Team) String() string {
 		return "red"
 	case Blue:
 		return "blue"
+	case Black:
+		return "black"
 	default:
 		return "netural"
 	}
+}
+
+func (t Team) Other() Team {
+	if t == Red {
+		return Blue
+	}
+	if t == Blue {
+		return Red
+	}
+	return t
 }
 
 func (t Team) MarshalJSON() ([]byte, error) {
@@ -43,13 +58,25 @@ func (t Team) Repeat(n int) []Team {
 	return s
 }
 
+type Clue struct {
+	Word  string `json:"word"`
+	Count int    `json:"count"`
+}
+
+func (c Clue) String() string {
+	return fmt.Sprintf("%s, %s", c.Word, c.Count)
+}
+
 type Game struct {
 	ID           string             `json:"id"`
 	Name         string             `json:"name"`
 	StartingTeam Team               `json:"starting_team"`
+	WinningTeam  *Team              `json:"winning_team,omitempty"`
 	Round        int                `json:"round"`
+	Clues        []Clue             `json:"clues"`
 	Words        []string           `json:"words"`
 	Layout       []Team             `json:"layout"`
+	Revealed     []bool             `json:"revealed"`
 	Players      map[string]*Player `json:"players"`
 	Codemaster   map[Team]*Player   `json:"codemaster"`
 }
@@ -65,9 +92,40 @@ func (g *Game) AddPlayer(p *Player, codemaster bool) error {
 
 	g.Players[p.ID] = p
 
-	if codemaster && p.Team != Neutral {
+	if codemaster && p.Team != Neutral && p.Team != Black {
 		g.Codemaster[p.Team] = p
 	}
+	return nil
+}
+
+func (g *Game) ProvideClue(c Clue) error {
+	if len(g.Clues) > g.Round {
+		return fmt.Errorf("The clue %s was already provided this round.", g.Clues[g.Round])
+	}
+	if len(strings.Split(c.Word, " ")) > 1 {
+		return errors.New("You must provide a single word as your clue.")
+	}
+
+	g.Clues = append(g.Clues, c)
+	return nil
+}
+
+func (g *Game) Guess(idx int) error {
+	if g.Revealed[idx] {
+		return errors.New("That cell has already been revealed.")
+	}
+	g.Revealed[idx] = true
+
+	if g.Layout[idx] == Black {
+		winners := g.CurrentTeam().Other()
+		g.WinningTeam = &winners
+		return nil
+	}
+
+	if g.Layout[idx] != g.CurrentTeam() {
+		g.Round = g.Round + 1
+	}
+
 	return nil
 }
 
@@ -75,10 +133,7 @@ func (g *Game) CurrentTeam() Team {
 	if g.Round%2 == 0 {
 		return g.StartingTeam
 	}
-	if g.StartingTeam == Red {
-		return Blue
-	}
-	return Red
+	return g.StartingTeam.Other()
 }
 
 type Player struct {
@@ -94,8 +149,13 @@ func newGame(name string, words []string) *Game {
 		StartingTeam: Team(rand.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
+		Revealed:     make([]bool, 0, wordsPerGame),
 		Codemaster:   make(map[Team]*Player),
 		Players:      make(map[string]*Player),
+	}
+
+	for i := range game.Revealed {
+		game.Revealed[i] = false
 	}
 
 	// Pick 25 random words.
@@ -110,9 +170,10 @@ func newGame(name string, words []string) *Game {
 
 	// Pick a random permutation of team assignments.
 	var teamAssignments []Team
-	teamAssignments = append(teamAssignments, Neutral.Repeat(8)...)
 	teamAssignments = append(teamAssignments, Red.Repeat(8)...)
 	teamAssignments = append(teamAssignments, Blue.Repeat(8)...)
+	teamAssignments = append(teamAssignments, Neutral.Repeat(7)...)
+	teamAssignments = append(teamAssignments, Black)
 	teamAssignments = append(teamAssignments, game.StartingTeam)
 	for i := range teamAssignments {
 		j := rand.Intn(i + 1)
