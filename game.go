@@ -93,6 +93,32 @@ func (g *Game) ProvideClue(c Clue) error {
 	return nil
 }
 
+func (g *Game) checkWinningCondition() {
+	if g.WinningTeam != nil {
+		return
+	}
+	var redRemaining, blueRemaining bool
+	for i, t := range g.Layout {
+		if g.Revealed[i] {
+			continue
+		}
+		if t == Red {
+			redRemaining = true
+		}
+		if t == Blue {
+			blueRemaining = true
+		}
+	}
+	if !redRemaining {
+		winners := Red
+		g.WinningTeam = &winners
+	}
+	if !blueRemaining {
+		winners := Blue
+		g.WinningTeam = &winners
+	}
+}
+
 func (g *Game) NextTurn() error {
 	if g.WinningTeam != nil {
 		return errors.New("the game is already over")
@@ -116,18 +142,7 @@ func (g *Game) Guess(idx int) error {
 		return nil
 	}
 
-	var remaining bool
-	for i, t := range g.Layout {
-		if t == g.CurrentTeam() && !g.Revealed[i] {
-			remaining = true
-		}
-	}
-	if !remaining {
-		winners := g.CurrentTeam()
-		g.WinningTeam = &winners
-		return nil
-	}
-
+	g.checkWinningCondition()
 	if g.Layout[idx] != g.CurrentTeam() {
 		g.Round = g.Round + 1
 	}
