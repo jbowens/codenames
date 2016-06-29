@@ -1,0 +1,52 @@
+h2 {
+    font-size: 1.1em;
+}
+
+#available-games {
+    width: 500px;
+    margin: 0 auto;
+    font-family: 'Courier New', monospace;
+}
+
+#available-games ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#available-games ul li {
+    font-size: 1.8em;
+    margin: 0.5em 0;
+    padding: 0.5em;
+    background: #F0F0F0;
+}
+
+#available-games ul li:hover {
+    background: #A5E5FA;
+    cursor: pointer;
+}
+
+#new-game {
+    margin: 0 auto 100px auto;
+}
+
+#new-game input#game-name {
+    height: 50px;
+    width: 350px;
+    padding: 5px 10px;
+    font-size: 1.3em;
+    border: 1px #DDD solid;
+    letter-spacing: 0.1em;
+}
+
+#new-game button {
+    height: 62px;
+    width: 120px;
+    padding: 5px 10px;
+    background: #85DE6F;
+    border: 1px #DDD solid;
+    font-size: 1em;
+    vertical-align: top;
+    text-transform: uppercase;
+    cursor: pointer;
+}

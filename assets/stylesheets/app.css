@@ -1,0 +1,47 @@
+html, body {
+  margin: 0;
+  font-family: 'Roboto', verdana, sans-serif;
+}
+
+#application {
+  margin: 1em;
+}
+
+#topbar {
+  padding: 1em;
+  margin-bottom: 2em;
+}
+
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-align: center;
+  font-family: "Courier New", monospace;
+}
+
+h1, h2, h3 {
+    font-family: 'Courier New', monospace;
+}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    #333;
+    font-style: italic;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    #333;
+   opacity:  1;
+   font-style: italic;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    #333;
+   opacity:  1;
+   font-style: italic;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color:    #333;
+   font-style: italic;
+}
+
+textarea:focus, input:focus, button:focus {
+    outline: none;
+}

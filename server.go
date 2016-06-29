@@ -2,15 +2,23 @@ package codenames
 
 import (
 	"encoding/json"
+	"html/template"
 	"net/http"
 	"path"
 	"sync"
+	"time"
 
+	"github.com/jbowens/assets"
 	"github.com/jbowens/dictionary"
 )
 
 type Server struct {
 	Server http.Server
+
+	tpl   *template.Template
+	jslib assets.Bundle
+	js    assets.Bundle
+	css   assets.Bundle
 
 	mu    sync.Mutex
 	games map[string]*Game
@@ -20,9 +28,6 @@ type Server struct {
 
 // POST /new
 func (s *Server) handleNewGame(rw http.ResponseWriter, req *http.Request) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	var request struct {
 		Name string `json:"name"`
 	}
@@ -33,42 +38,27 @@ func (s *Server) handleNewGame(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	g := newGame(request.Name, s.words)
 	s.games[g.ID] = g
 
 	writeJSON(rw, g)
 }
 
-// POST /join
-func (s *Server) handleJoinGame(rw http.ResponseWriter, req *http.Request) {
+// GET /games
+func (s *Server) handleListGames(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	var request struct {
-		GameID     string  `json:"game_id"`
-		Codemaster bool    `json:"codemaster"`
-		Player     *Player `json:"player"`
+	games := make([]*Game, 0, len(s.games))
+	for _, g := range s.games {
+		if g.WinningTeam == nil && g.CreatedAt.Add(time.Hour).After(time.Now()) {
+			games = append(games, g)
+		}
 	}
-
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&request); err != nil {
-		http.Error(rw, "Error decoding", 400)
-		return
-	}
-
-	g, ok := s.games[request.GameID]
-	if !ok {
-		http.Error(rw, "No such game", 404)
-		return
-	}
-
-	err := g.AddPlayer(request.Player, request.Codemaster)
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
-
-	writeJSON(rw, g)
+	writeJSON(rw, games)
 }
 
 // GET /game/<id>
@@ -88,13 +78,9 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 
 // POST /guess
 func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	var request struct {
-		GameID   string `json:"game_id"`
-		PlayerID string `json:"player_id"`
-		Index    int    `json:"index"`
+		GameID string `json:"game_id"`
+		Index  int    `json:"index"`
 	}
 
 	decoder := json.NewDecoder(req.Body)
@@ -102,6 +88,9 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Error decoding", 400)
 		return
 	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	g, ok := s.games[request.GameID]
 	if !ok {
@@ -116,11 +105,36 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
-// POST /clue
-func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
+// POST /end-turn
+func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
+	var request struct {
+		GameID string `json:"game_id"`
+	}
+
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&request); err != nil {
+		http.Error(rw, "Error decoding", 400)
+		return
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	g, ok := s.games[request.GameID]
+	if !ok {
+		http.Error(rw, "No such game", 404)
+		return
+	}
+
+	if err := g.NextTurn(); err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	writeJSON(rw, g)
+}
+
+// POST /clue
+func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
 		GameID string `json:"game_id"`
 		Clue   Clue   `json:"clue"`
@@ -131,6 +145,9 @@ func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Error decoding", 400)
 		return
 	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	g, ok := s.games[request.GameID]
 	if !ok {
@@ -146,7 +163,7 @@ func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) Start() error {
-	d, err := dictionary.Default()
+	d, err := dictionary.Load("assets/words.txt")
 	if err != nil {
 		return err
 	}
@@ -154,14 +171,50 @@ func (s *Server) Start() error {
 		return len(w) < 12
 	})
 
+	s.tpl, err = template.New("index").Parse(tpl)
+	if err != nil {
+		return err
+	}
+	s.jslib, err = assets.Development("assets/jslib")
+	if err != nil {
+		return err
+	}
+	s.js, err = assets.Development("assets/javascript")
+	if err != nil {
+		return err
+	}
+	s.css, err = assets.Development("assets/stylesheets")
+	if err != nil {
+		return err
+	}
+
 	s.mux = http.NewServeMux()
+
+	s.mux.HandleFunc("/games", s.handleListGames)
 	s.mux.HandleFunc("/new", s.handleNewGame)
-	s.mux.HandleFunc("/join", s.handleJoinGame)
+	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
+	s.mux.HandleFunc("/guess", s.handleGuess)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)
+
+	s.mux.Handle("/js/lib/", http.StripPrefix("/js/lib/", s.jslib))
+	s.mux.Handle("/js/", http.StripPrefix("/js/", s.js))
+	s.mux.Handle("/css/", http.StripPrefix("/css/", s.css))
+	s.mux.HandleFunc("/", s.handleIndex)
 
 	s.games = make(map[string]*Game)
 	s.words = d.Words()
 	s.Server.Handler = s.mux
 
 	return s.Server.ListenAndServe()
+}
+
+func writeJSON(rw http.ResponseWriter, resp interface{}) {
+	j, err := json.Marshal(resp)
+	if err != nil {
+		http.Error(rw, "unable to marshal response: "+err.Error(), 500)
+		return
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
+	rw.Write(j)
 }

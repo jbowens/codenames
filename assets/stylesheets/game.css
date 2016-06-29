@@ -1,0 +1,88 @@
+#game-view {
+  width: 700px;
+  margin: 0 auto;
+}
+
+#status-line { text-align: center; margin-bottom: 1em; }
+.red .status-text { color: #D13030; }
+.blue .status-text { color: #4183CC; }
+.win .status-text { font-size: 2em; }
+#status-line #status {
+    display: inline-block;
+    font-weight: bold;
+}
+
+.clear { clear: both; }
+
+#end-turn-btn {
+    border: 1px #DDD solid;
+    border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    padding: 5px;
+    float: right;
+    background: #EEE;
+    margin: 0 1em 0 0;
+    cursor: pointer;
+}
+
+#mode-toggle {
+    text-align: right;
+    margin: 2em 5px 2em 0;
+}
+
+#mode-toggle button {
+    padding: 5px;
+    border: 1px #DDD solid;
+    background: #EEE;
+    cursor: pointer;
+}
+
+#mode-toggle button.codemaster {
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    -moz-border-radius:  0 5px 5px 0;
+    -webkit-border-radius: 0 5px 5px 0;
+}
+
+#mode-toggle button.player {
+    border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
+    -webkit-border-radius: 5px 0 0 5px;
+}
+
+#mode-toggle.player-selected button.player,
+#mode-toggle.codemaster-selected button.codemaster {
+    cursor: auto;
+    color: #999;
+}
+
+.cell {
+    width: 120px;
+    height: 80px;
+    line-height: 80px;
+    margin: 5px;
+    padding: 5px;
+    display: inline-block;
+    text-align: center;
+}
+
+.player #board .hidden { cursor: pointer; }
+
+#board .neutral.revealed { background: #EDE2CC; }
+
+.cell .word {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.cell { background: #E8E8E8; }
+
+.codemaster .red.hidden { color: #D13030; }
+.codemaster .blue.hidden { color: #4183CC; }
+.codemaster .black.hidden { background: #CCC; }
+.codemaster .cell { font-weight: bold; }
+
+#board .red.revealed { background: #D13030; color: #FFF; }
+#board .blue.revealed { background: #4183CC; color: #FFF; }
+#board .black.revealed { background: #000000; color: #FFF; }
