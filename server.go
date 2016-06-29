@@ -163,14 +163,10 @@ func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) Start() error {
-	d, err := dictionary.Load("assets/words.txt")
+	d, err := dictionary.Load("assets/original.txt")
 	if err != nil {
 		return err
 	}
-	d = dictionary.Filter(d, func(w string) bool {
-		return len(w) < 12
-	})
-
 	s.tpl, err = template.New("index").Parse(tpl)
 	if err != nil {
 		return err
