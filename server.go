@@ -54,7 +54,7 @@ func (s *Server) handleListGames(rw http.ResponseWriter, req *http.Request) {
 
 	games := make([]*Game, 0, len(s.games))
 	for _, g := range s.games {
-		if g.WinningTeam == nil && g.CreatedAt.Add(time.Hour).After(time.Now()) {
+		if g.WinningTeam == nil && g.CreatedAt.Add(5*time.Minute).After(time.Now()) {
 			games = append(games, g)
 		}
 	}
