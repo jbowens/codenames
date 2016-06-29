@@ -41,7 +41,7 @@ window.Lobby = React.createClass({
             <div id="lobby">
                 <div id="available-games">
                     <form id="new-game">
-                        <input type="text" id="game-name" placeholder="Drake & gamez"
+                        <input type="text" id="game-name" placeholder="Drake & gamez" autoFocus
                             onChange={this.newGameTextChange} value={this.state.newGameName} />
                         <button onClick={this.handleNewGame}>New</button>
                     </form>
