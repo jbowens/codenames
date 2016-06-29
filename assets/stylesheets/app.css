@@ -24,21 +24,21 @@ h1, h2, h3 {
 }
 
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color:    #333;
+    color:    #999;
     font-style: italic;
 }
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color:    #333;
+   color:    #999;
    opacity:  1;
    font-style: italic;
 }
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color:    #333;
+   color:    #999;
    opacity:  1;
    font-style: italic;
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color:    #333;
+   color:    #999;
    font-style: italic;
 }
 
