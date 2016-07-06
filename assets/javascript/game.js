@@ -104,7 +104,7 @@ window.Game = React.createClass({
                 </div>
                 <form id="mode-toggle" className={this.state.codemaster ? "codemaster-selected" : "player-selected"}>
                     <button onClick={(e) => this.toggleRole(e, 'player')} className="player">Player</button>
-                    <button onClick={(e) => this.toggleRole(e, 'codemaster')} className="codemaster">Codemaster</button>
+                    <button onClick={(e) => this.toggleRole(e, 'codemaster')} className="codemaster">Spymaster</button>
                 </form>
             </div>
         );
