@@ -2,6 +2,7 @@ package codenames
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -162,6 +163,23 @@ func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
+func (s *Server) cleanupOldGames() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for id, g := range s.games {
+		if g.WinningTeam != nil && g.CreatedAt.Add(24*time.Hour).Before(time.Now()) {
+			delete(s.games, id)
+			fmt.Printf("Removed completed game %s\n", id)
+			continue
+		}
+		if g.CreatedAt.Add(72 * time.Hour).Before(time.Now()) {
+			delete(s.games, id)
+			fmt.Printf("Removed expired game %s\n", id)
+			continue
+		}
+	}
+}
+
 func (s *Server) Start() error {
 	d, err := dictionary.Load("assets/original.txt")
 	if err != nil {
@@ -201,6 +219,11 @@ func (s *Server) Start() error {
 	s.words = d.Words()
 	s.Server.Handler = s.mux
 
+	go func() {
+		for range time.Tick(10 * time.Minute) {
+			s.cleanupOldGames()
+		}
+	}()
 	return s.Server.ListenAndServe()
 }
 
