@@ -2,6 +2,12 @@ h2 {
     font-size: 1.1em;
 }
 
+p.intro {
+  line-height: 1.5em;
+  margin-bottom: 3em;
+  text-align: justify;
+}
+
 #available-games {
     width: 500px;
     margin: 0 auto;

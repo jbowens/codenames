@@ -3,6 +3,20 @@
   margin: 0 auto;
 }
 
+#share {
+  color: #888;
+  margin-bottom: 3em;
+  font-size: 0.8em;
+  padding-bottom: 2em;
+  border-bottom: 1px #EEE solid;
+  font-family: system, -apple-system, BlinkMacSystemFont,
+      "Helvetica Neue", "Lucida Grande";
+}
+
+#share .url {
+    color: #888;
+}
+
 #status-line { text-align: center; margin-bottom: 1em; }
 .red .status-text { color: #D13030; }
 .blue .status-text { color: #4183CC; }

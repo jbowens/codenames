@@ -21,7 +21,11 @@ const tpl = `
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     </head>
     <body>
-        <div id="app"></div>
+        <div id="app">
+			<h1>Codenames board game generator</h1>
+			<p>Play Codenames across multiple devices: computers, tablets, phones, etc.
+			Board state automatically syncs between devices.</p>
+		</div>
         <script type="text/babel">
             ReactDOM.render(<window.App />, document.getElementById('app'));
         </script>

@@ -85,6 +85,9 @@ window.Game = React.createClass({
 
         return (
             <div id="game-view" className={this.state.codemaster ? "codemaster" : "player"}>
+                <div id="share">
+                  To connect another device, open this URL on the other device's browser: <a className="url" href={window.location.href}>{window.location.href}</a>. All devices on this URL will share the same board.
+                </div>
                 <div id="status-line" className={statusClass}>
                     <div id="status" className="status-text">{status}</div>
                     {endTurnButton}
