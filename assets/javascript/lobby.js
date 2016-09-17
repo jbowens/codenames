@@ -8,7 +8,6 @@ window.Lobby = React.createClass({
         return {
             newGameName: this.props.defaultGameID,
             selectedGame: null,
-            games: [],
         };
     },
 

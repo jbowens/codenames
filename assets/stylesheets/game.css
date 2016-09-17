@@ -79,6 +79,10 @@
     color: #999;
 }
 
+#next-game-btn {
+    margin-left: 10px;
+}
+
 .cell {
     width: 120px;
     height: 80px;
