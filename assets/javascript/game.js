@@ -59,6 +59,19 @@ window.Game = React.createClass({
         return this.state.game.starting_team == 'red' ? 'blue' : 'red';
     },
 
+    remaining: function(color) {
+        var count = 0;
+        for (var i = 0; i < this.state.game.revealed.length; i++) {
+            if (this.state.game.revealed[i]) {
+                continue;
+            }
+            if (this.state.game.layout[i] == color) {
+                count++;
+            }
+        }
+        return count;
+    },
+
     endTurn: function() {
         $.post('/end-turn', JSON.stringify({game_id: this.state.game.id}),
               (g) => { this.setState({game: g}); });
@@ -83,6 +96,11 @@ window.Game = React.createClass({
             endTurnButton = (<button onClick={(e) => this.endTurn(e)} id="end-turn-btn">End {this.currentTeam()}&#39;s turn</button>)
         }
 
+        let otherTeam = 'blue';
+        if (this.state.game.starting_team == 'blue') {
+            otherTeam = 'red';
+        }
+
         return (
             <div id="game-view" className={this.state.codemaster ? "codemaster" : "player"}>
                 <div id="share">
@@ -90,6 +108,13 @@ window.Game = React.createClass({
                 </div>
                 <div id="status-line" className={statusClass}>
                     <div id="status" className="status-text">{status}</div>
+                </div>
+                <div id="button-line">
+                    <div id="remaining">
+                        <span className={this.state.game.starting_team+"-remaining"}>{this.remaining(this.state.game.starting_team)}</span>
+                        &nbsp;&ndash;&nbsp;
+                        <span className={otherTeam + "-remaining"}>{this.remaining(otherTeam)}</span>
+                    </div>
                     {endTurnButton}
                     <div className="clear"></div>
                 </div>

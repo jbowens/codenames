@@ -26,6 +26,14 @@
     font-weight: bold;
 }
 
+#remaining { float: left; }
+#remaining .red-remaining { color: #D13030; }
+#remaining .blue-remaining { color: #4183CC; }
+
+#button-line {
+    margin-bottom: 1em;
+}
+
 .clear { clear: both; }
 
 #end-turn-btn {
