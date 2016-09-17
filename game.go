@@ -98,7 +98,7 @@ func (g *Game) checkWinningCondition() {
 
 func (g *Game) NextTurn() error {
 	if g.WinningTeam != nil {
-		return errors.New("the game is already over")
+		return errors.New("game is already over")
 	}
 	g.Round++
 	return nil
@@ -106,10 +106,10 @@ func (g *Game) NextTurn() error {
 
 func (g *Game) Guess(idx int) error {
 	if idx > len(g.Layout) || idx < 0 {
-		return fmt.Errorf("Index %d is invalid.", idx)
+		return fmt.Errorf("index %d is invalid", idx)
 	}
 	if g.Revealed[idx] {
-		return errors.New("That cell has already been revealed.")
+		return errors.New("cell has already been revealed")
 	}
 	g.Revealed[idx] = true
 
