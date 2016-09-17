@@ -27,41 +27,6 @@ type Server struct {
 	mux   *http.ServeMux
 }
 
-// POST /new
-func (s *Server) handleNewGame(rw http.ResponseWriter, req *http.Request) {
-	var request struct {
-		Name string `json:"name"`
-	}
-
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&request); err != nil {
-		http.Error(rw, "Error decoding", 400)
-		return
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	g := newGame(request.Name, s.words)
-	s.games[g.ID] = g
-
-	writeJSON(rw, g)
-}
-
-// GET /games
-func (s *Server) handleListGames(rw http.ResponseWriter, req *http.Request) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	games := make([]*Game, 0, len(s.games))
-	for _, g := range s.games {
-		if g.WinningTeam == nil && g.CreatedAt.Add(5*time.Minute).After(time.Now()) {
-			games = append(games, g)
-		}
-	}
-	writeJSON(rw, games)
-}
-
 // GET /game/<id>
 func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
@@ -69,11 +34,13 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 
 	gameID := path.Base(req.URL.Path)
 	g, ok := s.games[gameID]
-	if !ok {
-		http.Error(rw, "No such game", 404)
+	if ok {
+		writeJSON(rw, g)
 		return
 	}
 
+	g = newGame(gameID, s.words)
+	s.games[gameID] = g
 	writeJSON(rw, g)
 }
 
@@ -175,8 +142,6 @@ func (s *Server) Start() error {
 
 	s.mux = http.NewServeMux()
 
-	s.mux.HandleFunc("/games", s.handleListGames)
-	s.mux.HandleFunc("/new", s.handleNewGame)
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)

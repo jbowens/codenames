@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-
-	"github.com/satori/go.uuid"
 )
 
 const (
@@ -60,7 +58,6 @@ func (t Team) Repeat(n int) []Team {
 
 type Game struct {
 	ID           string    `json:"id"`
-	Name         string    `json:"name"`
 	CreatedAt    time.Time `json:"created_at"`
 	StartingTeam Team      `json:"starting_team"`
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
@@ -133,10 +130,9 @@ func (g *Game) CurrentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(name string, words []string) *Game {
+func newGame(id string, words []string) *Game {
 	game := &Game{
-		ID:           uuid.NewV4().String(),
-		Name:         name,
+		ID:           id,
 		CreatedAt:    time.Now(),
 		StartingTeam: Team(rand.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
