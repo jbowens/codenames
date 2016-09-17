@@ -3,12 +3,15 @@ window.App = React.createClass({
         if (document.location.hash) {
             return {gameID: document.location.hash.slice(1)};
         }
+        if (window.selectedGameID) {
+            return {gameID: window.selectedGameID}
+        }
         return {gameID: null};
     },
 
     gameSelected: function(game) {
-        this.setState({gameID: game.id});
-        document.location.hash = '#' + game.id;
+        // this.setState({gameID: game.id});
+        document.location.pathname = '/' + game.id;
     },
 
     render: function() {
