@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"strings"
 	"time"
 
 	"github.com/satori/go.uuid"
@@ -59,15 +58,6 @@ func (t Team) Repeat(n int) []Team {
 	return s
 }
 
-type Clue struct {
-	Word  string `json:"word"`
-	Count int    `json:"count"`
-}
-
-func (c Clue) String() string {
-	return fmt.Sprintf("%s, %s", c.Word, c.Count)
-}
-
 type Game struct {
 	ID           string    `json:"id"`
 	Name         string    `json:"name"`
@@ -75,22 +65,9 @@ type Game struct {
 	StartingTeam Team      `json:"starting_team"`
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
 	Round        int       `json:"round"`
-	Clues        []Clue    `json:"clues"`
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
 	Revealed     []bool    `json:"revealed"`
-}
-
-func (g *Game) ProvideClue(c Clue) error {
-	if len(g.Clues) > g.Round {
-		return fmt.Errorf("The clue %s was already provided this round.", g.Clues[g.Round])
-	}
-	if len(strings.Split(c.Word, " ")) > 1 {
-		return errors.New("You must provide a single word as your clue.")
-	}
-
-	g.Clues = append(g.Clues, c)
-	return nil
 }
 
 func (g *Game) checkWinningCondition() {
