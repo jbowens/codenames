@@ -101,6 +101,25 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
+func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
+	var request struct {
+		GameID string `json:"game_id"`
+	}
+
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&request); err != nil {
+		http.Error(rw, "Error decoding", 400)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	g := newGame(request.GameID, s.words)
+	s.games[request.GameID] = g
+	writeJSON(rw, g)
+}
+
 func (s *Server) cleanupOldGames() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -142,6 +161,7 @@ func (s *Server) Start() error {
 
 	s.mux = http.NewServeMux()
 
+	s.mux.HandleFunc("/next-game", s.handleNextGame)
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)

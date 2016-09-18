@@ -77,6 +77,12 @@ window.Game = React.createClass({
               (g) => { this.setState({game: g}); });
     },
 
+    nextGame: function(e) {
+        e.preventDefault();
+        $.post('/next-game', JSON.stringify({game_id: this.state.game.id}),
+              (g) => { this.setState({game: g}); });
+    },
+
     render: function() {
         if (!this.state.game) {
             return (<p className="loading">Loading&hellip;</p>);
@@ -133,6 +139,7 @@ window.Game = React.createClass({
                 <form id="mode-toggle" className={this.state.codemaster ? "codemaster-selected" : "player-selected"}>
                     <button onClick={(e) => this.toggleRole(e, 'player')} className="player">Player</button>
                     <button onClick={(e) => this.toggleRole(e, 'codemaster')} className="codemaster">Spymaster</button>
+                    <button onClick={(e) => this.nextGame(e)} id="next-game-btn">Next game</button>
                 </form>
             </div>
         );
