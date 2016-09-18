@@ -43,6 +43,11 @@ const tpl = `
 			  margin-bottom: 1em;
 			}
 
+			#topbar a {
+			  color: black;
+			  text-decoration: none;
+			}
+
 			h1 {
 			  text-transform: uppercase;
 			  letter-spacing: 0.2em;
@@ -64,11 +69,6 @@ const tpl = `
     </head>
     <body>
 		<div id="app">
-			<div id="application">
-				<div id="topbar">
-					<h1>Codenames</h1>
-				</div>
-			</div>
 		</div>
         <script type="text/babel">
             ReactDOM.render(<window.App />, document.getElementById('app'));
