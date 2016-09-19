@@ -6,12 +6,15 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"regexp"
 	"sync"
 	"time"
 
 	"github.com/jbowens/assets"
 	"github.com/jbowens/dictionary"
 )
+
+var validClueRegex *regexp.Regexp
 
 type Server struct {
 	Server http.Server
@@ -120,6 +123,38 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
+// POST /clue
+func (s *Server) handleClue(rw http.ResponseWriter, req *http.Request) {
+	var request struct {
+		GameID string `json:"game_id"`
+		Word   string `json:"word"`
+		Count  int    `json:"count"`
+	}
+
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&request); err != nil {
+		http.Error(rw, "Error decoding", 400)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	g, ok := s.games[request.GameID]
+	if !ok {
+		http.Error(rw, "No such game", 404)
+		return
+	}
+
+	if ok := validClueRegex.MatchString(request.Word); !ok {
+		http.Error(rw, "not a valid clue", 400)
+		return
+	}
+
+	g.AddClue(request.Word, request.Count)
+	writeJSON(rw, g)
+}
+
 func (s *Server) cleanupOldGames() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -138,6 +173,8 @@ func (s *Server) cleanupOldGames() {
 }
 
 func (s *Server) Start() error {
+	validClueRegex, _ = regexp.Compile(`^[A-Za-z]+$`)
+
 	d, err := dictionary.Load("assets/original.txt")
 	if err != nil {
 		return err
@@ -164,6 +201,7 @@ func (s *Server) Start() error {
 	s.mux.HandleFunc("/next-game", s.handleNextGame)
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
+	s.mux.HandleFunc("/clue", s.handleClue)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)
 
 	s.mux.Handle("/js/lib/", http.StripPrefix("/js/lib/", s.jslib))

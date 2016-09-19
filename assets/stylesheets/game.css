@@ -26,6 +26,8 @@
     font-weight: bold;
 }
 
+.clue-line { text-align: center; margin-bottom: 1em; }
+
 #remaining { float: left; }
 #remaining .red-remaining { color: #D13030; }
 #remaining .blue-remaining { color: #4183CC; }

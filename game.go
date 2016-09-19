@@ -56,6 +56,11 @@ func (t Team) Repeat(n int) []Team {
 	return s
 }
 
+type Clue struct {
+	Word  string `json:"word"`
+	Count int    `json:"count"`
+}
+
 type Game struct {
 	ID           string    `json:"id"`
 	CreatedAt    time.Time `json:"created_at"`
@@ -65,6 +70,7 @@ type Game struct {
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
 	Revealed     []bool    `json:"revealed"`
+	Clue         *Clue     `json:"clue"`
 }
 
 func (g *Game) checkWinningCondition() {
@@ -98,6 +104,7 @@ func (g *Game) NextTurn() error {
 		return errors.New("game is already over")
 	}
 	g.Round++
+	g.Clue = nil
 	return nil
 }
 
@@ -119,6 +126,7 @@ func (g *Game) Guess(idx int) error {
 	g.checkWinningCondition()
 	if g.Layout[idx] != g.CurrentTeam() {
 		g.Round = g.Round + 1
+		g.Clue = nil
 	}
 	return nil
 }
@@ -128,6 +136,13 @@ func (g *Game) CurrentTeam() Team {
 		return g.StartingTeam
 	}
 	return g.StartingTeam.Other()
+}
+
+func (g *Game) AddClue(word string, count int) {
+	g.Clue = &Clue{
+		Word:  word,
+		Count: count,
+	}
 }
 
 func newGame(id string, words []string) *Game {

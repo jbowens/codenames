@@ -25,9 +25,19 @@ window.Game = React.createClass({
       }
 
       $.get('/game/' + this.props.gameID, (data) => {
+          if (this.state.game && data.round != this.state.game.round) {
+            this.changedTurn();
+          }
           this.setState({game: data});
           setTimeout(this.refresh, 3000);
       });
+    },
+
+    changedTurn: function() {
+        $('#clue-word')[0].value = "";
+        $('#clue-word')[0].disabled = false;
+        $('#clue-count')[0].value = "";
+        $('#clue-count')[0].disabled = false;
     },
 
     toggleRole: function(e, role) {
@@ -74,13 +84,28 @@ window.Game = React.createClass({
 
     endTurn: function() {
         $.post('/end-turn', JSON.stringify({game_id: this.state.game.id}),
-              (g) => { this.setState({game: g}); });
+              (g) => { this.setState({game: g}); this.changedTurn(); });
     },
 
     nextGame: function(e) {
         e.preventDefault();
         $.post('/next-game', JSON.stringify({game_id: this.state.game.id}),
               (g) => { this.setState({game: g}); });
+    },
+
+    giveClue: function(e) {
+        let clueWord = $('#clue-word')[0].value;
+        let clueCount = parseInt($('#clue-count')[0].value);
+        // How does this not have an error callback :(
+        $.post('/clue', JSON.stringify({
+            game_id: this.state.game.id,
+            word: clueWord,
+            count: clueCount
+        }), (g) => {
+            this.setState({game: g});
+            $('#clue-word')[0].disabled = true;
+            $('#clue-count')[0].disabled = true;
+        });
     },
 
     render: function() {
@@ -107,6 +132,23 @@ window.Game = React.createClass({
             otherTeam = 'red';
         }
 
+        let clueDOM;
+        if (this.state.codemaster) {
+            clueDOM = (
+                <div className="clue-line">
+                    <input type="text" id="clue-word" placeholder="word" autoFocus />
+                    <input type="number" id="clue-count" placeholder="count" />
+                    <button onClick={this.giveClue}>Give Clue</button>
+                </div>
+            )
+        } else {
+            clueDOM = (
+                <div className="clue-line">
+                    {this.state.game.clue ? "Clue: " + this.state.game.clue.word + "(" + this.state.game.clue.count + ")" : "Waiting for clue..."}
+                </div>
+            );
+        }
+
         return (
             <div id="game-view" className={this.state.codemaster ? "codemaster" : "player"}>
                 <div id="share">
@@ -115,6 +157,7 @@ window.Game = React.createClass({
                 <div id="status-line" className={statusClass}>
                     <div id="status" className="status-text">{status}</div>
                 </div>
+                {clueDOM}
                 <div id="button-line">
                     <div id="remaining">
                         <span className={this.state.game.starting_team+"-remaining"}>{this.remaining(this.state.game.starting_team)}</span>
