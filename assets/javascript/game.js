@@ -25,6 +25,9 @@ window.Game = React.createClass({
       }
 
       $.get('/game/' + this.props.gameID, (data) => {
+          if (this.state.game && data.created_at != this.state.game.created_at) {
+            this.setState({codemaster: false});
+          }
           this.setState({game: data});
           setTimeout(this.refresh, 3000);
       });
@@ -80,7 +83,7 @@ window.Game = React.createClass({
     nextGame: function(e) {
         e.preventDefault();
         $.post('/next-game', JSON.stringify({game_id: this.state.game.id}),
-              (g) => { this.setState({game: g}); });
+              (g) => { this.setState({game: g, codemaster: false}) });
     },
 
     render: function() {
