@@ -34,10 +34,9 @@ window.Game = React.createClass({
     },
 
     changedTurn: function() {
-        $('#clue-word')[0].value = "";
-        $('#clue-word')[0].disabled = false;
-        $('#clue-count')[0].value = "";
-        $('#clue-count')[0].disabled = false;
+        let g = this.state.game
+        g.clue.word = ""
+        this.setState({game: g, hasClue: false});
     },
 
     toggleRole: function(e, role) {
@@ -102,9 +101,7 @@ window.Game = React.createClass({
             word: clueWord,
             count: clueCount
         }), (g) => {
-            this.setState({game: g});
-            $('#clue-word')[0].disabled = true;
-            $('#clue-count')[0].disabled = true;
+            this.setState({game: g, hasClue: true});
         });
     },
 
@@ -136,8 +133,8 @@ window.Game = React.createClass({
         if (this.state.codemaster) {
             clueDOM = (
                 <div className="clue-line">
-                    <input type="text" id="clue-word" placeholder="word" autoFocus />
-                    <input type="number" id="clue-count" placeholder="count" />
+                    <input type="text" id="clue-word" disabled={this.state.hasClue} placeholder="word" autoFocus />
+                    <input type="number" id="clue-count" disabled={this.state.hasClue} placeholder="count" />
                     <button onClick={this.giveClue}>Give Clue</button>
                 </div>
             )
