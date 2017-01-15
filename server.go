@@ -124,12 +124,12 @@ func (s *Server) cleanupOldGames() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for id, g := range s.games {
-		if g.WinningTeam != nil && g.CreatedAt.Add(24*time.Hour).Before(time.Now()) {
+		if g.WinningTeam != nil && g.CreatedAt.Add(12*time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			fmt.Printf("Removed completed game %s\n", id)
 			continue
 		}
-		if g.CreatedAt.Add(72 * time.Hour).Before(time.Now()) {
+		if g.CreatedAt.Add(24 * time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			fmt.Printf("Removed expired game %s\n", id)
 			continue
