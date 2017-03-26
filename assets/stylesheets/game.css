@@ -93,7 +93,7 @@
     text-align: center;
 }
 
-.player #board .hidden { cursor: pointer; }
+.player #board .hidden-word { cursor: pointer; }
 
 #board .neutral.revealed { background: #EDE2CC; }
 
@@ -104,9 +104,9 @@
 
 .cell { background: #E8E8E8; }
 
-.codemaster .red.hidden { color: #D13030; }
-.codemaster .blue.hidden { color: #4183CC; }
-.codemaster .black.hidden { background: #CCC; }
+.codemaster .red.hidden-word { color: #D13030; }
+.codemaster .blue.hidden-word { color: #4183CC; }
+.codemaster .black.hidden-word { background: #CCC; }
 .codemaster .cell { font-weight: bold; }
 
 #board .red.revealed { background: #D13030; color: #FFF; }

@@ -131,7 +131,7 @@ window.Game = React.createClass({
                   {this.state.game.words.map((w, idx) =>
                     (
                         <div for={idx}
-                             className={"cell " + this.state.game.layout[idx] + " " + (this.state.game.revealed[idx] ? "revealed" : "hidden")}
+                             className={"cell " + this.state.game.layout[idx] + " " + (this.state.game.revealed[idx] ? "revealed" : "hidden-word")}
                              onClick={(e) => this.guess(e, idx, w)}
                         >
                             <span className="word">{w}</span>
