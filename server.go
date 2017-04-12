@@ -21,6 +21,8 @@ type Server struct {
 	js    assets.Bundle
 	css   assets.Bundle
 
+	gameIDWords []string
+
 	mu    sync.Mutex
 	games map[string]*Game
 	words []string
@@ -138,6 +140,10 @@ func (s *Server) cleanupOldGames() {
 }
 
 func (s *Server) Start() error {
+	gameIDs, err := dictionary.Load("assets/game-id-words.txt")
+	if err != nil {
+		return err
+	}
 	d, err := dictionary.Load("assets/original.txt")
 	if err != nil {
 		return err
@@ -170,6 +176,9 @@ func (s *Server) Start() error {
 	s.mux.Handle("/js/", http.StripPrefix("/js/", s.js))
 	s.mux.Handle("/css/", http.StripPrefix("/css/", s.css))
 	s.mux.HandleFunc("/", s.handleIndex)
+
+	gameIDs = dictionary.Filter(gameIDs, func(s string) bool { return len(s) > 3 })
+	s.gameIDWords = gameIDs.Words()
 
 	s.games = make(map[string]*Game)
 	s.words = d.Words()
