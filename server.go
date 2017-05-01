@@ -122,6 +122,25 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
+func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var inProgress, completed int
+	for _, g := range s.games {
+		if g.WinningTeam == nil {
+			inProgress++
+		} else {
+			completed++
+		}
+	}
+
+	writeJSON(rw, struct {
+		InProgress int `json:"games_in_progress"`
+		Completed  int `json:"games_completed"`
+	}{inProgress, completed})
+}
+
 func (s *Server) cleanupOldGames() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -167,6 +186,7 @@ func (s *Server) Start() error {
 
 	s.mux = http.NewServeMux()
 
+	s.mux.HandleFunc("/stats", s.handleStats)
 	s.mux.HandleFunc("/next-game", s.handleNextGame)
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
