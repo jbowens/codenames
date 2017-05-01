@@ -6,6 +6,8 @@ p.intro {
   line-height: 1.5em;
   margin-bottom: 3em;
   text-align: justify;
+  font-family: verdana;
+  font-size: 0.9em;
 }
 
 #available-games {

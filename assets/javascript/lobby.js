@@ -39,11 +39,12 @@ window.Lobby = React.createClass({
                     <form id="new-game">
                         <p className="intro">
                            This app allows you to play Codenames across multiple devices
-                           with a shared board. To create a new game, click 'New.'
+                           with a shared board. To create a new game or join an existing
+                           game, enter a game identifer and click 'Go.'
                         </p>
                         <input type="text" id="game-name" autoFocus
                             onChange={this.newGameTextChange} value={this.state.newGameName} />
-                        <button onClick={this.handleNewGame}>New</button>
+                        <button onClick={this.handleNewGame}>Go</button>
                     </form>
                 </div>
             </div>
