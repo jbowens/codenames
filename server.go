@@ -11,10 +11,12 @@ import (
 
 	"github.com/jbowens/assets"
 	"github.com/jbowens/dictionary"
+	"github.com/jbowens/events"
 )
 
 type Server struct {
 	Server http.Server
+	Events *events.Logger
 
 	tpl   *template.Template
 	jslib assets.Bundle
@@ -42,6 +44,7 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	g = newGame(gameID, s.words)
+	g.overFunc = s.gameOver
 	s.games[gameID] = g
 	writeJSON(rw, g)
 }
@@ -122,23 +125,35 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	writeJSON(rw, g)
 }
 
+type statsResponse struct {
+	InProgress int `json:"games_in_progress"`
+	Completed  int `json:"games_completed"`
+}
+
 func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
+	var inProgress, completed int
+
+	if s.Events != nil {
+		var event gameCompletedEvent
+		s.Events.Iter("game_completed", func(decodeNext func(v interface{}) error) error {
+			if err := decodeNext(&event); err != nil {
+				return err
+			}
+
+			completed++
+			return nil
+		})
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	var inProgress, completed int
 	for _, g := range s.games {
 		if g.WinningTeam == nil {
 			inProgress++
-		} else {
-			completed++
 		}
 	}
-
-	writeJSON(rw, struct {
-		InProgress int `json:"games_in_progress"`
-		Completed  int `json:"games_completed"`
-	}{inProgress, completed})
+	writeJSON(rw, statsResponse{inProgress, completed})
 }
 
 func (s *Server) cleanupOldGames() {

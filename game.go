@@ -65,6 +65,9 @@ type Game struct {
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
 	Revealed     []bool    `json:"revealed"`
+
+	// overFunc is a callback called when the game is over
+	overFunc func(*Game) `json:"-"`
 }
 
 func (g *Game) checkWinningCondition() {
@@ -90,6 +93,9 @@ func (g *Game) checkWinningCondition() {
 	if !blueRemaining {
 		winners := Blue
 		g.WinningTeam = &winners
+	}
+	if g.WinningTeam != nil && g.overFunc != nil {
+		g.overFunc(g)
 	}
 }
 
