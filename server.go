@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"path"
 	"sync"
@@ -41,7 +42,7 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	g = newGame(gameID, s.words)
+	g = newGame(gameID, s.words, rand.Int63())
 	s.games[gameID] = g
 	writeJSON(rw, g)
 }
@@ -117,7 +118,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	g := newGame(request.GameID, s.words)
+	g := newGame(request.GameID, s.words, rand.Int63())
 	s.games[request.GameID] = g
 	writeJSON(rw, g)
 }

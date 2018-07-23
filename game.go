@@ -56,6 +56,7 @@ func (t Team) Repeat(n int) []Team {
 
 type Game struct {
 	ID           string    `json:"id"`
+	Seed         int64     `json:"seed"`
 	CreatedAt    time.Time `json:"created_at"`
 	StartingTeam Team      `json:"starting_team"`
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
@@ -128,11 +129,13 @@ func (g *Game) CurrentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, words []string) *Game {
+func newGame(id string, words []string, seed int64) *Game {
+	rnd := rand.New(rand.NewSource(seed))
 	game := &Game{
 		ID:           id,
+		Seed:         seed,
 		CreatedAt:    time.Now(),
-		StartingTeam: Team(rand.Intn(2)) + Red,
+		StartingTeam: Team(rnd.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
 		Revealed:     make([]bool, wordsPerGame),
@@ -141,7 +144,7 @@ func newGame(id string, words []string) *Game {
 	// Pick 25 random words.
 	used := map[string]struct{}{}
 	for len(used) < wordsPerGame {
-		w := words[rand.Intn(len(words))]
+		w := words[rnd.Intn(len(words))]
 		if _, ok := used[w]; !ok {
 			used[w] = struct{}{}
 			game.Words = append(game.Words, w)
@@ -156,17 +159,17 @@ func newGame(id string, words []string) *Game {
 	teamAssignments = append(teamAssignments, Black)
 	teamAssignments = append(teamAssignments, game.StartingTeam)
 
-	shuffleCount := rand.Intn(5) + 5
+	shuffleCount := rnd.Intn(5) + 5
 	for i := 0; i < shuffleCount; i++ {
-		shuffle(teamAssignments)
+		shuffle(rnd, teamAssignments)
 	}
 	game.Layout = teamAssignments
 	return game
 }
 
-func shuffle(teamAssignments []Team) {
+func shuffle(rnd *rand.Rand, teamAssignments []Team) {
 	for i := range teamAssignments {
-		j := rand.Intn(i + 1)
+		j := rnd.Intn(i + 1)
 		teamAssignments[i], teamAssignments[j] = teamAssignments[j], teamAssignments[i]
 	}
 }
