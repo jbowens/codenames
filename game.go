@@ -1,6 +1,9 @@
 package codenames
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -54,16 +57,49 @@ func (t Team) Repeat(n int) []Team {
 	return s
 }
 
+// GameState encapsulates enough data to reconstruct
+// a Game's state. It's used to recreate games after
+// a process restart.
+type GameState struct {
+	Seed     int64  `json:"seed"`
+	Round    int    `json:"round"`
+	Revealed []bool `json:"revealed"`
+}
+
+func (gs GameState) ID() string {
+	var buf bytes.Buffer
+	err := gob.NewEncoder(&buf).Encode(gs)
+	if err != nil {
+		return ""
+	}
+	return base64.URLEncoding.EncodeToString(buf.Bytes())
+}
+
+func decodeGameState(s string) (GameState, bool) {
+	data, err := base64.URLEncoding.DecodeString(s)
+	if err != nil {
+		return GameState{}, false
+	}
+	var state GameState
+	err = gob.NewDecoder(bytes.NewReader(data)).Decode(&state)
+	return state, err == nil
+}
+
+func randomState() GameState {
+	return GameState{
+		Seed:     rand.Int63(),
+		Revealed: make([]bool, wordsPerGame),
+	}
+}
+
 type Game struct {
+	GameState
 	ID           string    `json:"id"`
-	Seed         int64     `json:"seed"`
 	CreatedAt    time.Time `json:"created_at"`
 	StartingTeam Team      `json:"starting_team"`
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
-	Round        int       `json:"round"`
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
-	Revealed     []bool    `json:"revealed"`
 }
 
 func (g *Game) checkWinningCondition() {
@@ -129,16 +165,15 @@ func (g *Game) CurrentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, words []string, seed int64) *Game {
-	rnd := rand.New(rand.NewSource(seed))
+func newGame(id string, words []string, state GameState) *Game {
+	rnd := rand.New(rand.NewSource(state.Seed))
 	game := &Game{
 		ID:           id,
-		Seed:         seed,
 		CreatedAt:    time.Now(),
 		StartingTeam: Team(rnd.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
-		Revealed:     make([]bool, wordsPerGame),
+		GameState:    state,
 	}
 
 	// Pick 25 random words.

@@ -24,13 +24,18 @@ window.Game = React.createClass({
           return;
       }
 
-      $.get('/game/' + this.props.gameID, (data) => {
+      var refreshURL = '/game/' + this.props.gameID;
+      if (this.state.game && this.state.game.state_id) {
+        refreshURL = refreshURL + "?state_id=" + this.state.game.state_id;
+      }
+
+      $.get(refreshURL, (data) => {
           if (this.state.game && data.created_at != this.state.game.created_at) {
             this.setState({codemaster: false});
           }
           this.setState({game: data});
-          setTimeout(this.refresh, 3000);
       });
+      setTimeout(this.refresh, 3000);
     },
 
     toggleRole: function(e, role) {
@@ -51,6 +56,7 @@ window.Game = React.createClass({
         }
         $.post('/guess', JSON.stringify({
             game_id: this.state.game.id,
+            state_id: this.state.game.state_id,
             index: idx,
         }), (g) => { this.setState({game: g}); });
     },
@@ -76,8 +82,10 @@ window.Game = React.createClass({
     },
 
     endTurn: function() {
-        $.post('/end-turn', JSON.stringify({game_id: this.state.game.id}),
-              (g) => { this.setState({game: g}); });
+        $.post('/end-turn', JSON.stringify({
+            game_id: this.state.game.id,
+            state_id: this.state.game.state_id,
+        }), (g) => { this.setState({game: g}); });
     },
 
     nextGame: function(e) {
