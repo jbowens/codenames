@@ -8,9 +8,7 @@ import (
 	"time"
 )
 
-const (
-	wordsPerGame = 25
-)
+const wordsPerGame = 25
 
 type Team int
 
@@ -76,10 +74,10 @@ func (g *Game) checkWinningCondition() {
 		if g.Revealed[i] {
 			continue
 		}
-		if t == Red {
+		switch t {
+		case Red:
 			redRemaining = true
-		}
-		if t == Blue {
+		case Blue:
 			blueRemaining = true
 		}
 	}
@@ -163,7 +161,6 @@ func newGame(id string, words []string) *Game {
 		shuffle(teamAssignments)
 	}
 	game.Layout = teamAssignments
-
 	return game
 }
 
