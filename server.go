@@ -11,12 +11,10 @@ import (
 
 	"github.com/jbowens/assets"
 	"github.com/jbowens/dictionary"
-	"github.com/jbowens/events"
 )
 
 type Server struct {
 	Server http.Server
-	Events *events.Logger
 
 	tpl   *template.Template
 	jslib assets.Bundle
@@ -44,7 +42,6 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	g = newGame(gameID, s.words)
-	g.overFunc = s.gameOver
 	s.games[gameID] = g
 	writeJSON(rw, g)
 }
@@ -127,23 +124,10 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 
 type statsResponse struct {
 	InProgress int `json:"games_in_progress"`
-	Completed  int `json:"games_completed"`
 }
 
 func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
-	var inProgress, completed int
-
-	if s.Events != nil {
-		var event gameCompletedEvent
-		s.Events.Iter("game_completed", func(decodeNext func(v interface{}) error) error {
-			if err := decodeNext(&event); err != nil {
-				return err
-			}
-
-			completed++
-			return nil
-		})
-	}
+	var inProgress int
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -153,7 +137,7 @@ func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
 			inProgress++
 		}
 	}
-	writeJSON(rw, statsResponse{inProgress, completed})
+	writeJSON(rw, statsResponse{inProgress})
 }
 
 func (s *Server) cleanupOldGames() {
