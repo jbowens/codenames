@@ -11,11 +11,12 @@ const tpl = `
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Codenames</title>
+        <title>Codenames - Play Online</title>
         <script src="/js/lib/browser.min.js"></script>
         <script src="/js/lib/react.min.js"></script>
         <script src="/js/lib/react-dom.min.js"></script>
         <script src="/js/lib/jquery-3.0.0.min.js"></script>
+        <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAwSURBVHgB7dJRDQAABEVRJFJBNvX8SEQINrO9G+B8XTaPokFCwwAsAPdxqmKk90ADdlUE2gRVHXcAAAAASUVORK5CYII="/>
 
         <script type="text/babel">
              {{if .SelectedGameID}}
