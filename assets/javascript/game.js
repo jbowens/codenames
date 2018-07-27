@@ -1,41 +1,76 @@
+var settingToggles = [{
+  name: 'Color-blind mode',
+  setting: 'colorBlind',
+}]
+
 window.Game = React.createClass({
     propTypes: {
         gameID: React.PropTypes.string,
+    },
+
+    getInitialSettings: function() {
+        try {
+            var settings = localStorage.getItem('settings');
+            return JSON.parse(settings) || {};
+        } catch(e) {
+            return {};
+        }
+    },
+
+    saveSettings: function(settings) {
+        this.setState({settings});
+        try {
+            localStorage.setItem('settings', JSON.stringify(settings));
+        } catch(e) {}
     },
 
     getInitialState: function() {
         return {
             game: null,
             mounted: true,
+            settings: this.getInitialSettings(),
+            mode: 'game',
             codemaster: false,
         };
     },
 
+    extraClasses: function() {
+        var classes = '';
+        if (this.state.settings.colorBlind) classes += ' color-blind';
+        return classes;
+    },
+
+    handleKeyDown: function(e) {
+        if (e.keyCode == 27) this.setState({mode: 'game'});
+    },
+
     componentWillMount: function() {
-      this.refresh();
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
+        this.refresh();
     },
 
     componentWillUnmount: function() {
-      this.setState({mounted: false});
+        window.removeEventListener("keydown", this.handleKeyDown.bind(this));
+        this.setState({mounted: false});
     },
 
     refresh: function() {
-      if (!this.state.mounted) {
-          return;
-      }
+        if (!this.state.mounted) {
+            return;
+        }
 
-      var refreshURL = '/game/' + this.props.gameID;
-      if (this.state.game && this.state.game.state_id) {
-        refreshURL = refreshURL + "?state_id=" + this.state.game.state_id;
-      }
+        var refreshURL = '/game/' + this.props.gameID;
+        if (this.state.game && this.state.game.state_id) {
+            refreshURL = refreshURL + "?state_id=" + this.state.game.state_id;
+        }
 
-      $.get(refreshURL, (data) => {
-          if (this.state.game && data.created_at != this.state.game.created_at) {
-            this.setState({codemaster: false});
-          }
-          this.setState({game: data});
-      });
-      setTimeout(this.refresh, 3000);
+        $.get(refreshURL, (data) => {
+            if (this.state.game && data.created_at != this.state.game.created_at) {
+                this.setState({codemaster: false});
+            }
+            this.setState({game: data});
+        });
+        setTimeout(this.refresh, 3000);
     },
 
     toggleRole: function(e, role) {
@@ -94,9 +129,53 @@ window.Game = React.createClass({
               (g) => { this.setState({game: g, codemaster: false}) });
     },
 
+    toggleSettings: function(e) {
+        if (e != null) e.preventDefault();
+        if (this.state.mode == 'settings') {
+            this.setState({mode: 'game'});
+        } else {
+            this.setState({mode: 'settings'});
+        }
+    },
+
+    toggleSetting: function(e, setting) {
+        if (e != null) e.preventDefault();
+        var settings = {...this.state.settings};
+        if (settings[setting]) settings[setting] = false;
+        else settings[setting] = true;
+        this.saveSettings(settings);
+    },
+
     render: function() {
         if (!this.state.game) {
             return (<p className="loading">Loading&hellip;</p>);
+        }
+
+        if (this.state.mode == 'settings') {
+            return (
+                <div className="settings">
+                    <div onClick={(e) => this.toggleSettings(e)} className="close-settings">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0L30 30M30 0L0 30" transform="translate(1 1)" stroke="black" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div className="settings-content">
+                        <h2>SETTINGS</h2>
+                        <div className="toggles">
+                            {settingToggles.map((toggle) => (
+                            <div className="toggle-set">
+                                <div className="settings-label">
+                                    {toggle.name} <span className={'toggle-state'}>{this.state.settings[toggle.setting] ? 'ON' : 'OFF'}</span>
+                                </div>
+                                <div onClick={(e) => this.toggleSetting(e, toggle.setting)} className={this.state.settings[toggle.setting] ? 'toggle active' : 'toggle inactive'}>
+                                    <div className="switch"></div>
+                                </div>
+                            </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
         }
 
         let status, statusClass;
@@ -119,7 +198,7 @@ window.Game = React.createClass({
         }
 
         return (
-            <div id="game-view" className={this.state.codemaster ? "codemaster" : "player"}>
+            <div id="game-view" className={(this.state.codemaster ? "codemaster" : "player") + this.extraClasses()}>
                 <div id="share">
                   Send this link to friends: <a className="url" href={window.location.href}>{window.location.href}</a>
                 </div>
@@ -135,7 +214,7 @@ window.Game = React.createClass({
                     {endTurnButton}
                     <div className="clear"></div>
                 </div>
-                <div id="board">
+                <div className="board">
                   {this.state.game.words.map((w, idx) =>
                     (
                         <div for={idx}
@@ -148,6 +227,11 @@ window.Game = React.createClass({
                   )}
                 </div>
                 <form id="mode-toggle" className={this.state.codemaster ? "codemaster-selected" : "player-selected"}>
+                    <button onClick={(e) => this.toggleSettings(e)} className="gear">
+                      <svg width="30" height="30" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.3344 4.86447L24.31 8.23766C21.9171 9.80387 21.1402 12.9586 22.5981 15.4479C23.038 16.1989 23.6332 16.8067 24.3204 17.2543L22.2714 20.7527C20.6682 19.9354 18.6888 19.9151 17.0088 20.8712C15.3443 21.8185 14.3731 23.4973 14.2734 25.2596H10.3693C10.3241 24.4368 10.087 23.612 9.64099 22.8504C8.16283 20.3266 4.93593 19.4239 2.34593 20.7661L0.342913 17.3461C2.85907 15.8175 3.70246 12.5796 2.21287 10.0362C1.74415 9.23595 1.09909 8.59835 0.354399 8.14386L2.34677 4.74208C3.95677 5.5788 5.95446 5.60726 7.64791 4.64346C9.31398 3.69524 10.2854 2.0141 10.3836 0.25H14.267C14.2917 1.11932 14.5297 1.99505 15.0012 2.80013C16.4866 5.33635 19.738 6.23549 22.3344 4.86447ZM15.0038 17.3703C17.6265 15.8776 18.5279 12.5685 17.0114 9.97937C15.4963 7.39236 12.1437 6.50866 9.52304 8.00013C6.90036 9.4928 5.99896 12.8019 7.5154 15.391C9.03058 17.978 12.3832 18.8617 15.0038 17.3703Z" transform="translate(12.7548) rotate(30)" fill="#EEE" stroke="#BBB" stroke-width="0.5"/>
+                      </svg>
+                    </button>
                     <button onClick={(e) => this.toggleRole(e, 'player')} className="player">Player</button>
                     <button onClick={(e) => this.toggleRole(e, 'codemaster')} className="codemaster">Spymaster</button>
                     <button onClick={(e) => this.nextGame(e)} id="next-game-btn">Next game</button>
