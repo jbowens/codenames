@@ -1,16 +1,16 @@
 #game-view {
-  width: 700px;
-  margin: 0 auto;
+    width: 700px;
+    margin: 0 auto;
 }
 
 #share {
-  color: #888;
-  margin-bottom: 3em;
-  font-size: 0.8em;
-  padding-bottom: 2em;
-  border-bottom: 1px #EEE solid;
-  font-family: system, -apple-system, BlinkMacSystemFont,
-      "Helvetica Neue", "Lucida Grande";
+    color: #888;
+    margin-bottom: 3em;
+    font-size: 0.8em;
+    padding-bottom: 2em;
+    border-bottom: 1px #EEE solid;
+    font-family: system, -apple-system, BlinkMacSystemFont,
+        "Helvetica Neue", "Lucida Grande";
 }
 
 #share .url {
@@ -51,6 +51,9 @@
 #mode-toggle {
     text-align: right;
     margin: 2em 5px 2em 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 #mode-toggle button {
@@ -58,6 +61,13 @@
     border: 1px #DDD solid;
     background: #EEE;
     cursor: pointer;
+}
+
+#mode-toggle button.gear {
+    border: none;
+    padding: 0;
+    background-color: transparent;
+    margin: 2px 8px 0;
 }
 
 #mode-toggle button.codemaster {
@@ -84,18 +94,18 @@
 }
 
 .cell {
-    width: 120px;
-    height: 80px;
-    line-height: 80px;
+    width: 130px;
+    height: 90px;
+    box-sizing: border-box;
+    line-height: 90px;
     margin: 5px;
-    padding: 5px;
     display: inline-block;
     text-align: center;
 }
 
-.player #board .hidden-word { cursor: pointer; }
+.player .board .hidden-word { cursor: pointer; }
 
-#board .neutral.revealed { background: #EDE2CC; }
+.board .neutral.revealed { background: #EDE2CC; }
 
 .cell .word {
     vertical-align: middle;
@@ -109,6 +119,103 @@
 .codemaster .black.hidden-word { background: #CCC; }
 .codemaster .cell { font-weight: bold; }
 
-#board .red.revealed { background: #D13030; color: #FFF; }
-#board .blue.revealed { background: #4183CC; color: #FFF; }
-#board .black.revealed { background: #000000; color: #FFF; }
+.board .red.revealed { background: #D13030; color: #FFF; }
+.board .blue.revealed { background: #4183CC; color: #FFF; }
+.board .black.revealed { background: #000000; color: #FFF; }
+
+#remaining span {
+    display: inline-block;
+    padding: 3px 5px;
+}
+
+.color-blind #status {
+    padding: 3px 5px;
+}
+
+.color-blind .blue-remaining, .color-blind #status-line.blue #status {
+    border: 2px solid #4183cc;
+}
+
+.color-blind .red-remaining, .color-blind #status-line.red #status {
+    border: 2px dashed #d13030;
+}
+
+.color-blind .codemaster .red.hidden-word, .color-blind .red.revealed {
+    outline: 2px dashed #d13030;
+    border: 1px solid white;
+}
+
+.color-blind .codemaster .blue.hidden-word, .color-blind .blue.revealed {
+    outline: 2px solid #4183cc;
+    border: 1px solid white;
+}
+
+.color-blind .revealed .word {
+    text-decoration: underline;
+}
+
+.settings {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-color: white;
+    text-align: center;
+}
+
+.close-settings {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    cursor: pointer;
+}
+
+.settings-content {
+    width: 240px;
+    margin: 80px auto;
+}
+
+.settings h2 {
+    font-size: 1.5em;
+    margin: 5em 0 2em;
+}
+
+.toggle-set {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.settings-toggle {
+    display: flex;
+    height: 32px;
+    width: 50px;
+    border-radius: 16px;
+    background-color: #eee;
+    margin-right: 16px;
+    cursor: pointer;
+}
+
+.switch {
+    height: 32px;
+    width: 32px;
+    border-radius: 16px;
+    box-sizing: border-box;
+    border: 1px solid #bbb;
+    background-color: white;
+}
+
+.color-blind-toggle.color-blind {
+    background-color: #34BE5B;
+    justify-content: flex-end;
+}
+
+.color-blind-on.color-blind, .color-blind-off {
+    display: inline;
+    font-weight: bold;
+}
+
+.color-blind-on, .color-blind-off.color-blind {
+    display: none;
+}
