@@ -178,6 +178,7 @@
 
 .settings h2 {
     font-size: 1.5em;
+    letter-spacing: 0.1em;
     margin: 5em 0 2em;
 }
 
@@ -187,13 +188,12 @@
     justify-content: space-between;
 }
 
-.settings-toggle {
+.toggle {
     display: flex;
     height: 32px;
     width: 50px;
     border-radius: 16px;
     background-color: #eee;
-    margin-right: 16px;
     cursor: pointer;
 }
 
@@ -206,16 +206,11 @@
     background-color: white;
 }
 
-.color-blind-toggle.color-blind {
+.toggle.active {
     background-color: #34BE5B;
     justify-content: flex-end;
 }
 
-.color-blind-on.color-blind, .color-blind-off {
-    display: inline;
+.toggle-state {
     font-weight: bold;
-}
-
-.color-blind-on, .color-blind-off.color-blind {
-    display: none;
 }

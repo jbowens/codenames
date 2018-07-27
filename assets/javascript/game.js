@@ -1,3 +1,8 @@
+var settingToggles = [{
+  name: 'Color-blind mode',
+  setting: 'colorBlind',
+}]
+
 window.Game = React.createClass({
     propTypes: {
         gameID: React.PropTypes.string,
@@ -13,6 +18,7 @@ window.Game = React.createClass({
     },
 
     saveSettings: function(settings) {
+        this.setState({settings});
         try {
             localStorage.setItem('settings', JSON.stringify(settings));
         } catch(e) {}
@@ -138,7 +144,6 @@ window.Game = React.createClass({
         if (settings[setting]) settings[setting] = false;
         else settings[setting] = true;
         this.saveSettings(settings);
-        this.setState({settings});
     },
 
     render: function() {
@@ -155,18 +160,18 @@ window.Game = React.createClass({
                         </svg>
                     </div>
                     <div className="settings-content">
-                        <h2>Settings</h2>
+                        <h2>SETTINGS</h2>
                         <div className="toggles">
+                            {settingToggles.map((toggle) => (
                             <div className="toggle-set">
-                                <div onClick={(e) => this.toggleSetting(e, 'colorBlind')} className={'settings-toggle color-blind-toggle'+this.extraClasses()}>
+                                <div className="settings-label">
+                                    {toggle.name} <span className={'toggle-state'}>{this.state.settings[toggle.setting] ? 'ON' : 'OFF'}</span>
+                                </div>
+                                <div onClick={(e) => this.toggleSetting(e, toggle.setting)} className={this.state.settings[toggle.setting] ? 'toggle active' : 'toggle inactive'}>
                                     <div className="switch"></div>
                                 </div>
-                                <div className="settings-label">
-                                    Color-blind mode
-                                    <span className={'color-blind-on'+this.extraClasses()}> ON</span>
-                                    <span className={'color-blind-off'+this.extraClasses()}> OFF</span>
-                                </div>
                             </div>
+                            ))}
                         </div>
                     </div>
                 </div>
