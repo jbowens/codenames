@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"sort"
 	"sync"
 	"time"
 
@@ -223,6 +224,7 @@ func (s *Server) Start() error {
 
 	s.games = make(map[string]*Game)
 	s.words = d.Words()
+	sort.Strings(s.words)
 	s.Server.Handler = s.mux
 
 	go func() {
