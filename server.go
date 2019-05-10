@@ -10,17 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jbowens/assets"
 	"github.com/jbowens/dictionary"
 )
 
 type Server struct {
 	Server http.Server
-
-	tpl   *template.Template
-	jslib assets.Bundle
-	js    assets.Bundle
-	css   assets.Bundle
+	tpl    *template.Template
 
 	gameIDWords []string
 
@@ -193,30 +188,14 @@ func (s *Server) Start() error {
 	if err != nil {
 		return err
 	}
-	s.jslib, err = assets.Development("assets/jslib")
-	if err != nil {
-		return err
-	}
-	s.js, err = assets.Development("assets/javascript")
-	if err != nil {
-		return err
-	}
-	s.css, err = assets.Development("assets/stylesheets")
-	if err != nil {
-		return err
-	}
 
 	s.mux = http.NewServeMux()
-
 	s.mux.HandleFunc("/stats", s.handleStats)
 	s.mux.HandleFunc("/next-game", s.handleNextGame)
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)
-
-	s.mux.Handle("/js/lib/", http.StripPrefix("/js/lib/", s.jslib))
-	s.mux.Handle("/js/", http.StripPrefix("/js/", s.js))
-	s.mux.Handle("/css/", http.StripPrefix("/css/", s.css))
+	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/dist"))))
 	s.mux.HandleFunc("/", s.handleIndex)
 
 	gameIDs = dictionary.Filter(gameIDs, func(s string) bool { return len(s) > 3 })
