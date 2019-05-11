@@ -1,15 +1,10 @@
 import * as React from 'react'
-import { GearButton } from '~/ui/gear_button'
+import { Settings, SettingsButton, SettingsPanel } from '~/ui/settings'
 
 // TODO: remove jquery dependency
 // https://stackoverflow.com/questions/47968529/how-do-i-use-jquery-and-jquery-ui-with-parcel-bundler
 let jquery = require("jquery");
 window.$ = window.jQuery = jquery;
-
-const settingToggles = [{
-  name: 'Color-blind mode',
-  setting: 'colorBlind',
-}]
 
 export class Game extends React.Component{
   constructor(props) {
@@ -17,33 +12,17 @@ export class Game extends React.Component{
     this.state = {
       game: null,
       mounted: true,
-      settings: this.getInitialSettings(),
+      settings: Settings.load(),
       mode: 'game',
       codemaster: false,
     };
   }
 
-  public getInitialSettings() {
-    try {
-      var settings = localStorage.getItem('settings');
-      return JSON.parse(settings) || {};
-    } catch(e) {
-      console.error(e);
-    }
-  }
-
-  public saveSettings(settings) {
-    this.setState({settings});
-    try {
-      localStorage.setItem('settings', JSON.stringify(settings));
-    } catch(e) {
-      console.error(e);
-    }
-  }
-
   public extraClasses() {
     var classes = '';
-    if (this.state.settings.colorBlind) classes += ' color-blind';
+    if (this.state.settings.colorBlind) {
+      classes += ' color-blind';
+    }
     return classes;
   }
 
@@ -136,9 +115,9 @@ export class Game extends React.Component{
     e.preventDefault();
     $.post('/next-game', JSON.stringify({game_id: this.state.game.id}),
         (g) => { this.setState({game: g, codemaster: false}) });
-  },
+  }
 
-  public toggleSettings(e) {
+  public toggleSettingsView(e) {
     if (e != null) {
       e.preventDefault();
     }
@@ -153,40 +132,22 @@ export class Game extends React.Component{
     if (e != null) {
       e.preventDefault();
     }
-    var settings = {...this.state.settings};
-    settings[setting] = !settings[setting]
-    this.saveSettings(settings);
+    const vals = {...this.state.settings};
+    vals[setting] = !vals[setting];
+    this.setState({settings: vals});
+    Settings.save(vals);
   }
 
   render() {
     if (!this.state.game) {
       return (<p className="loading">Loading&hellip;</p>);
     }
-
     if (this.state.mode == 'settings') {
       return (
-        <div className="settings">
-          <div onClick={(e) => this.toggleSettings(e)} className="close-settings">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 0L30 30M30 0L0 30" transform="translate(1 1)" stroke="black" strokeWidth="2"/>
-            </svg>
-          </div>
-          <div className="settings-content">
-            <h2>SETTINGS</h2>
-            <div className="toggles">
-              {settingToggles.map((toggle) => (
-              <div className="toggle-set" key={toggle.setting}>
-                <div className="settings-label">
-                  {toggle.name} <span className={'toggle-state'}>{this.state.settings[toggle.setting] ? 'ON' : 'OFF'}</span>
-                </div>
-                <div onClick={(e) => this.toggleSetting(e, toggle.setting)} className={this.state.settings[toggle.setting] ? 'toggle active' : 'toggle inactive'}>
-                  <div className="switch"></div>
-                </div>
-              </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <SettingsPanel
+          toggleView={(e) => this.toggleSettingsView(e)}
+          toggle={(e, setting) => this.toggleSetting(e, setting)}
+          values={this.state.settings} />
       );
     }
 
@@ -239,7 +200,7 @@ export class Game extends React.Component{
           )}
         </div>
         <form id="mode-toggle" className={this.state.codemaster ? "codemaster-selected" : "player-selected"}>
-          <GearButton onClick={(e) => this.toggleSettings(e)} />
+          <SettingsButton onClick={(e) => {this.toggleSettingsView(e)}} />
           <button onClick={(e) => this.toggleRole(e, 'player')} className="player">Player</button>
           <button onClick={(e) => this.toggleRole(e, 'codemaster')} className="codemaster">Spymaster</button>
           <button onClick={(e) => this.nextGame(e)} id="next-game-btn">Next game</button>
