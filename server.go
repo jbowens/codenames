@@ -19,10 +19,10 @@ type Server struct {
 
 	gameIDWords []string
 
-	mu    sync.Mutex
-	games map[string]*Game
-	words []string
-	mux   *http.ServeMux
+	mu           sync.Mutex
+	games        map[string]*Game
+	defaultWords []string
+	mux          *http.ServeMux
 }
 
 func (s *Server) getGame(gameID, stateID string) (*Game, bool) {
@@ -34,7 +34,7 @@ func (s *Server) getGame(gameID, stateID string) (*Game, bool) {
 	if !ok {
 		return nil, false
 	}
-	g = newGame(gameID, s.words, state)
+	g = newGame(gameID, s.defaultWords, state)
 	s.games[gameID] = g
 	return g, true
 }
@@ -57,7 +57,7 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	g = newGame(gameID, s.words, randomState())
+	g = newGame(gameID, s.defaultWords, randomState())
 	s.games[gameID] = g
 	writeGame(rw, g)
 }
@@ -135,7 +135,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	g := newGame(request.GameID, s.words, randomState())
+	g := newGame(request.GameID, s.defaultWords, randomState())
 	s.games[request.GameID] = g
 	writeGame(rw, g)
 }
@@ -202,8 +202,8 @@ func (s *Server) Start() error {
 	s.gameIDWords = gameIDs.Words()
 
 	s.games = make(map[string]*Game)
-	s.words = d.Words()
-	sort.Strings(s.words)
+	s.defaultWords = d.Words()
+	sort.Strings(s.defaultWords)
 	s.Server.Handler = s.mux
 
 	go func() {
