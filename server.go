@@ -34,7 +34,7 @@ func (s *Server) getGame(gameID, stateID string) (*Game, bool) {
 	if !ok {
 		return nil, false
 	}
-	g = newGame(gameID, s.defaultWords, state)
+	g = newGame(gameID, state)
 	s.games[gameID] = g
 	return g, true
 }
@@ -58,7 +58,7 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	g = newGame(gameID, s.defaultWords, randomState())
+	g = newGame(gameID, randomState(s.defaultWords))
 	s.games[gameID] = g
 	writeGame(rw, g)
 }
@@ -82,7 +82,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 		writeGame(rw, g)
 		return
 	}
-	g = newGame(body.GameID, s.defaultWords, randomState())
+	g = newGame(body.GameID, randomState(s.defaultWords))
 	s.games[body.GameID] = g
 	writeGame(rw, g)
 }
@@ -160,7 +160,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	g := newGame(request.GameID, s.defaultWords, randomState())
+	g := newGame(request.GameID, randomState(s.defaultWords))
 	s.games[request.GameID] = g
 	writeGame(rw, g)
 }

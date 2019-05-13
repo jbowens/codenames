@@ -95,10 +95,11 @@ func decodeGameState(s string, defaultWords []string) (GameState, bool) {
 	return state, true
 }
 
-func randomState() GameState {
+func randomState(words []string) GameState {
 	return GameState{
 		Seed:     rand.Int63(),
 		Revealed: make([]bool, wordsPerGame),
+		WordSet:  words,
 	}
 }
 
@@ -175,7 +176,7 @@ func (g *Game) CurrentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, words []string, state GameState) *Game {
+func newGame(id string, state GameState) *Game {
 	rnd := rand.New(rand.NewSource(state.Seed))
 	game := &Game{
 		ID:           id,
@@ -189,7 +190,7 @@ func newGame(id string, words []string, state GameState) *Game {
 	// Pick 25 random words.
 	used := map[string]struct{}{}
 	for len(used) < wordsPerGame {
-		w := words[rnd.Intn(len(words))]
+		w := state.WordSet[rnd.Intn(len(state.WordSet))]
 		if _, ok := used[w]; !ok {
 			used[w] = struct{}{}
 			game.Words = append(game.Words, w)
