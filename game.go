@@ -61,9 +61,10 @@ func (t Team) Repeat(n int) []Team {
 // a Game's state. It's used to recreate games after
 // a process restart.
 type GameState struct {
-	Seed     int64  `json:"seed"`
-	Round    int    `json:"round"`
-	Revealed []bool `json:"revealed"`
+	Seed     int64    `json:"seed"`
+	Round    int      `json:"round"`
+	Revealed []bool   `json:"revealed"`
+	WordSet  []string `json:"word_set"`
 }
 
 func (gs GameState) ID() string {
@@ -75,14 +76,23 @@ func (gs GameState) ID() string {
 	return base64.URLEncoding.EncodeToString(buf.Bytes())
 }
 
-func decodeGameState(s string) (GameState, bool) {
+func decodeGameState(s string, defaultWords []string) (GameState, bool) {
 	data, err := base64.URLEncoding.DecodeString(s)
 	if err != nil {
 		return GameState{}, false
 	}
 	var state GameState
 	err = gob.NewDecoder(bytes.NewReader(data)).Decode(&state)
-	return state, err == nil
+	if err != nil {
+		return GameState{}, false
+	}
+	if len(state.WordSet) == 0 {
+		state.WordSet = defaultWords
+	}
+	if len(state.WordSet) < 25 {
+		return GameState{}, false
+	}
+	return state, true
 }
 
 func randomState() GameState {

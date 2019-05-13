@@ -30,7 +30,7 @@ func (s *Server) getGame(gameID, stateID string) (*Game, bool) {
 	if ok {
 		return g, ok
 	}
-	state, ok := decodeGameState(stateID)
+	state, ok := decodeGameState(stateID, s.defaultWords)
 	if !ok {
 		return nil, false
 	}
