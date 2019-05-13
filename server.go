@@ -40,6 +40,7 @@ func (s *Server) getGame(gameID, stateID string) (*Game, bool) {
 }
 
 // GET /game/<id>
+// (deprecated: use POST /game-state instead)
 func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -59,6 +60,30 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 
 	g = newGame(gameID, s.defaultWords, randomState())
 	s.games[gameID] = g
+	writeGame(rw, g)
+}
+
+// POST /game-state
+func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
+	var body struct {
+		GameID  string `json:"game_id"`
+		StateID string `json:"state_id"`
+	}
+	err := json.NewDecoder(req.Body).Decode(&body)
+	if err != nil {
+		http.Error(rw, "Error decoding request body", 400)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	g, ok := s.getGame(body.GameID, body.StateID)
+	if ok {
+		writeGame(rw, g)
+		return
+	}
+	g = newGame(body.GameID, s.defaultWords, randomState())
+	s.games[body.GameID] = g
 	writeGame(rw, g)
 }
 
@@ -195,6 +220,7 @@ func (s *Server) Start() error {
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)
+	s.mux.HandleFunc("/game-state", s.handleGameState)
 	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/dist"))))
 	s.mux.HandleFunc("/", s.handleIndex)
 

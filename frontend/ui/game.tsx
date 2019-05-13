@@ -47,18 +47,18 @@ export class Game extends React.Component{
       return;
     }
 
-    var refreshURL = '/game/' + this.props.gameID;
+    const body = {game_id: this.props.gameID};
     if (this.state.game && this.state.game.state_id) {
-      refreshURL = refreshURL + "?state_id=" + this.state.game.state_id;
+      body.state_id = this.state.game.state_id;
     }
-
-    $.get(refreshURL, (data) => {
+    $.post('/game-state', JSON.stringify(body), (data) => {
       if (this.state.game && data.created_at != this.state.game.created_at) {
           this.setState({codemaster: false});
       }
       this.setState({game: data});
     });
-    setTimeout(() => {this.refresh();}, 3000);
+
+    setTimeout(() => {this.refresh();}, 2000);
   }
 
   public toggleRole(e, role) {
