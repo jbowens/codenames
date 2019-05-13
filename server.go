@@ -148,19 +148,28 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 
 func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
-		GameID string `json:"game_id"`
+		GameID  string   `json:"game_id"`
+		WordSet []string `json:"word_set"`
 	}
 
-	decoder := json.NewDecoder(req.Body)
-	if err := decoder.Decode(&request); err != nil {
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		http.Error(rw, "Error decoding", 400)
 		return
+	}
+	if len(request.WordSet) > 0 && len(request.WordSet) < 25 {
+		http.Error(rw, "Need at least 25 words", 400)
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	g := newGame(request.GameID, randomState(s.defaultWords))
+	words := request.WordSet
+	sort.Strings(words)
+	if len(words) == 0 {
+		words = s.defaultWords
+	}
+
+	g := newGame(request.GameID, randomState(words))
 	s.games[request.GameID] = g
 	writeGame(rw, g)
 }
