@@ -24,7 +24,6 @@
 }
 .red .status-text { color: #D13030; }
 .blue .status-text { color: #4183CC; }
-.win .status-text { font-size: 2em; }
 
 #remaining { float: left; }
 #remaining .red-remaining { color: #D13030; }
