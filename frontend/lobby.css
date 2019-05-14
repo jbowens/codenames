@@ -58,3 +58,40 @@ p.intro {
     text-transform: uppercase;
     cursor: pointer;
 }
+
+#new-game-options {
+    margin-top: 1em;
+}
+
+.btn-configured-word-set {
+    color: #AAA;
+    font-family: verdana, sans-serif;
+    font-size: 0.8em;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.btn-configured-word-set .label { flex-grow: 1; }
+
+#new-game-options textarea {
+    width: 100%;
+    height: 25em;
+    margin: 0.5em 0;
+    font-size: 0.6em;
+    border: 1px #DDD solid;
+    font-family: "verdana", sans-serif;
+    line-height: 2em;
+    text-transofrm: uppercase;
+}
+
+.btn-configured-word-set .symbol {
+    width: 1em;
+    display: inline-block;
+}
+.btn-configured-word-set .warning {
+    color: #aa2a16;
+}
+.btn-configured-word-set:hover .label {
+    color: #333;
+}
