@@ -5,7 +5,7 @@
 
 #share {
     color: #888;
-    margin-bottom: 3em;
+    margin-bottom: 2em;
     font-size: 0.8em;
     padding-bottom: 2em;
     border-bottom: 1px #EEE solid;
@@ -17,22 +17,18 @@
     color: #888;
 }
 
-#status-line { text-align: center; margin-bottom: 1em; }
+#status-line {
+    margin: 1em;
+    display: flex;
+    justify-content: space-between;
+}
 .red .status-text { color: #D13030; }
 .blue .status-text { color: #4183CC; }
 .win .status-text { font-size: 2em; }
-#status-line #status {
-    display: inline-block;
-    font-weight: bold;
-}
 
 #remaining { float: left; }
 #remaining .red-remaining { color: #D13030; }
 #remaining .blue-remaining { color: #4183CC; }
-
-#button-line {
-    margin-bottom: 1em;
-}
 
 .clear { clear: both; }
 
@@ -44,7 +40,6 @@
     padding: 5px;
     float: right;
     background: #EEE;
-    margin: 0 1em 0 0;
     cursor: pointer;
 }
 
