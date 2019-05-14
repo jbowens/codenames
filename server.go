@@ -163,6 +163,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	}
 	if len(wordSet) > 0 && len(wordSet) < 25 {
 		http.Error(rw, "Need at least 25 words", 400)
+		return
 	}
 
 	s.mu.Lock()
