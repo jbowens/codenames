@@ -113,7 +113,7 @@ export class Game extends React.Component{
 
   public nextGame(e) {
     e.preventDefault();
-    $.post('/next-game', JSON.stringify({game_id: this.state.game.id}),
+    $.post('/next-game', JSON.stringify({game_id: this.state.game.id, word_set: this.state.game.word_set}),
         (g) => { this.setState({game: g, codemaster: false}) });
   }
 
