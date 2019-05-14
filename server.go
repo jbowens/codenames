@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -156,17 +157,24 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Error decoding", 400)
 		return
 	}
-	if len(request.WordSet) > 0 && len(request.WordSet) < 25 {
+	wordSet := map[string]bool{}
+	for _, w := range request.WordSet {
+		wordSet[strings.TrimSpace(strings.ToUpper(w))] = true
+	}
+	if len(wordSet) > 0 && len(wordSet) < 25 {
 		http.Error(rw, "Need at least 25 words", 400)
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	words := request.WordSet
-	sort.Strings(words)
-	if len(words) == 0 {
-		words = s.defaultWords
+	words := s.defaultWords
+	if len(wordSet) > 0 {
+		words = nil
+		for w := range wordSet {
+			words = append(words, w)
+		}
+		sort.Strings(words)
 	}
 
 	g := newGame(request.GameID, randomState(words))
