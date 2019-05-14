@@ -1,13 +1,39 @@
+html, body {
+  margin: 0;
+  font-family: 'Roboto', verdana, sans-serif;
+}
+
+#application {
+    margin: 1vh 1vw;
+}
+
+#topbar a {
+  color: black;
+  text-decoration: none;
+}
+
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-align: center;
+  font-family: "Courier New", monospace;
+  margin: 1vh 0;
+}
+
+h1, h2, h3 {
+    font-family: 'Courier New', monospace;
+}
+
 #game-view {
-    width: 700px;
     margin: 0 auto;
 }
 
 #share {
     color: #888;
-    margin-bottom: 3em;
+    width: 95vw;
+    margin: 0 auto 2vh auto;
     font-size: 0.8em;
-    padding-bottom: 2em;
+    padding-bottom: 1em;
     border-bottom: 1px #EEE solid;
     font-family: system, -apple-system, BlinkMacSystemFont,
         "Helvetica Neue", "Lucida Grande";
@@ -17,22 +43,28 @@
     color: #888;
 }
 
-#status-line { text-align: center; margin-bottom: 1em; }
+#status-line {
+    margin: 1vh auto;
+    width: 95vw;
+    margin-bottom: 1em;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .red .status-text { color: #D13030; }
 .blue .status-text { color: #4183CC; }
 .win .status-text { font-size: 2em; }
 #status-line #status {
     display: inline-block;
-    font-weight: bold;
 }
 
 #remaining { float: left; }
 #remaining .red-remaining { color: #D13030; }
 #remaining .blue-remaining { color: #4183CC; }
 
-#button-line {
-    margin-bottom: 1em;
-}
+
 
 .clear { clear: both; }
 
@@ -50,7 +82,8 @@
 
 #mode-toggle {
     text-align: right;
-    margin: 2em 5px 2em 0;
+    margin: 1vh auto;
+    width: 95vw;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -93,14 +126,23 @@
     margin-left: 10px;
 }
 
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  min-width: 95vw;
+}
+
 .cell {
-    width: 130px;
-    height: 90px;
+    width: 18vw;
+    height: 15vh;
     box-sizing: border-box;
-    line-height: 90px;
-    margin: 5px;
-    display: inline-block;
+    line-height: 15vh;
+    display: block;
     text-align: center;
+    margin: 1vh 0;
+    font-size: 1.5vw;
+    letter-spacing: 0.15vw;
 }
 
 .player .board .hidden-word { cursor: pointer; }
@@ -117,7 +159,6 @@
 .codemaster .red.hidden-word { color: #D13030; }
 .codemaster .blue.hidden-word { color: #4183CC; }
 .codemaster .black.hidden-word { background: #CCC; }
-.codemaster .cell { font-weight: bold; }
 
 .board .red.revealed { background: #D13030; color: #FFF; }
 .board .blue.revealed { background: #4183CC; color: #FFF; }

@@ -176,16 +176,13 @@ export class Game extends React.Component{
           Send this link to friends: <a className="url" href={window.location.href}>{window.location.href}</a>
         </div>
         <div id="status-line" className={statusClass}>
-          <div id="status" className="status-text">{status}</div>
-        </div>
-        <div id="button-line">
           <div id="remaining">
             <span className={this.state.game.starting_team+"-remaining"}>{this.remaining(this.state.game.starting_team)}</span>
             &nbsp;&ndash;&nbsp;
             <span className={otherTeam + "-remaining"}>{this.remaining(otherTeam)}</span>
           </div>
+          <div id="status" className="status-text">{status}</div>
           {endTurnButton}
-          <div className="clear"></div>
         </div>
         <div className="board">
           {this.state.game.words.map((w, idx) =>
