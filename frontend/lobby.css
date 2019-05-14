@@ -110,7 +110,7 @@ p.intro {
     border: 1px #DDD solid;
     font-family: "verdana", sans-serif;
     line-height: 2em;
-    text-transofrm: uppercase;
+    text-transform: uppercase;
 }
 
 .btn-configured-word-set .symbol {
