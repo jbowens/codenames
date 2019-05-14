@@ -1,4 +1,4 @@
-#game-view {
+#game-view, .loading {
     width: 700px;
     margin: 0 auto;
 }
@@ -13,9 +13,7 @@
         "Helvetica Neue", "Lucida Grande";
 }
 
-#share .url {
-    color: #888;
-}
+#share .url { color: #888; }
 
 #status-line {
     margin: 1em;
@@ -28,8 +26,6 @@
 #remaining { float: left; }
 #remaining .red-remaining { color: #D13030; }
 #remaining .blue-remaining { color: #4183CC; }
-
-.clear { clear: both; }
 
 #end-turn-btn {
     border: 1px #DDD solid;
@@ -98,7 +94,6 @@
 }
 
 .player .board .hidden-word { cursor: pointer; }
-
 .board .neutral.revealed { background: #EDE2CC; }
 
 .cell .word {
