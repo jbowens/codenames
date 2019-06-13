@@ -2,13 +2,17 @@ import * as React from 'react'
 
 const settingToggles = [
   {
-    name: 'Color-blind mode',
+    name: 'Full-screen',
+    setting: 'fullscreen',
+  },
+  {
+    name: 'Color-blind',
     setting: 'colorBlind',
   },
   {
-    name: 'Dark mode',
+    name: 'Dark',
     setting: 'darkMode',
-  }
+  },
 ]
 
 export class Settings {

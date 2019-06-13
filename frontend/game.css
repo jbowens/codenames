@@ -100,7 +100,6 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  width: 700px;
   height: 500px;
 }
 
@@ -163,6 +162,14 @@
 .dark-mode #end-turn-btn, .dark-mode #mode-toggle button { background: #444; border: 1px #999 solid; color: #BBB; }
 .dark-mode #mode-toggle button.gear { background-color: transparent; border: none; color: #444; }
 .dark-mode #remaining { color: #EEE; }
+
+#game-view.full-screen { width: 98vw; }
+.full-screen .board { height: 75vh; }
+.full-screen .cell { font-size: 1.5vw; }
+.full-screen #status-line { font-size: 3vh; margin: 0.25em 0; }
+@media (width < 1000px) {
+  .full-screen .cell { font-size: 2.5vw; }
+}
 
 .settings {
     position: fixed;

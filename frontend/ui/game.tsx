@@ -26,6 +26,9 @@ export class Game extends React.Component{
     if (this.state.settings.darkMode) {
       classes += ' dark-mode';
     }
+    if (this.state.settings.fullscreen) {
+      classes += ' full-screen';
+    }
     return classes;
   }
 
@@ -184,11 +187,17 @@ export class Game extends React.Component{
       otherTeam = 'red';
     }
 
+    let shareLink = null;
+    if (!this.state.settings.fullscreen) {
+      shareLink = (<div id="share">
+        Send this link to friends:
+        <a className="url" href={window.location.href}>{window.location.href}</a>
+      </div>);
+    }
+
     return (
       <div id="game-view" className={(this.state.codemaster ? "codemaster" : "player") + this.extraClasses()}>
-        <div id="share">
-          Send this link to friends: <a className="url" href={window.location.href}>{window.location.href}</a>
-        </div>
+        { shareLink }
         <div id="status-line" className={statusClass}>
           <div id="remaining">
             <span className={this.state.game.starting_team+"-remaining"}>{this.remaining(this.state.game.starting_team)}</span>

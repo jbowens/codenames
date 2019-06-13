@@ -3,11 +3,8 @@ html, body {
   font-family: 'Roboto', verdana, sans-serif;
 }
 
-#application { margin: 1em; }
-
 #topbar {
   padding: 1em;
-  margin-bottom: 1em;
 }
 
 #topbar a {
