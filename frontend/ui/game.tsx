@@ -162,7 +162,11 @@ export class Game extends React.Component{
 
     let endTurnButton;
     if (!this.state.game.winning_team && !this.state.codemaster) {
-      endTurnButton = (<button onClick={(e) => this.endTurn(e)} id="end-turn-btn">End {this.currentTeam()}&#39;s turn</button>)
+      endTurnButton = (<div id="end-turn-cont">
+        <button onClick={(e) => this.endTurn(e)} id="end-turn-btn">
+          End {this.currentTeam()}&#39;s turn
+        </button>
+      </div>)
     }
 
     let otherTeam = 'blue';
