@@ -23,6 +23,9 @@ export class Game extends React.Component{
     if (this.state.settings.colorBlind) {
       classes += ' color-blind';
     }
+    if (this.state.settings.darkMode) {
+      classes += ' dark-mode';
+    }
     return classes;
   }
 
@@ -149,6 +152,13 @@ export class Game extends React.Component{
           toggle={(e, setting) => this.toggleSetting(e, setting)}
           values={this.state.settings} />
       );
+    }
+
+    // TODO: This is hacky as hell.
+    if (this.state.settings.darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
     }
 
     let status, statusClass;

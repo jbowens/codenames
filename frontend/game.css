@@ -44,7 +44,7 @@
 
 #mode-toggle {
     text-align: right;
-    margin: 2em 5px 2em 0;
+    margin: 0.5em 0;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -154,6 +154,16 @@
     text-decoration: underline;
 }
 
+.dark-mode { background: rgb(33, 33, 33); }
+.dark-mode h1 { color: #CCC; }
+.dark-mode .cell { background: rgb(117, 117, 117); }
+.dark-mode .codemaster .blue { color: rgb(13, 64, 123); }
+.dark-mode .codemaster .red { color: rgb(140, 15, 15); }
+.dark-mode .codemaster .blue.revealed, .dark-mode .codemaster .red.revealed { color: #FFF; }
+.dark-mode #end-turn-btn, .dark-mode #mode-toggle button { background: #444; border: 1px #999 solid; color: #BBB; }
+.dark-mode #mode-toggle button.gear { background-color: transparent; border: none; color: #444; }
+.dark-mode #remaining { color: #EEE; }
+
 .settings {
     position: fixed;
     left: 0;
@@ -172,8 +182,9 @@
 }
 
 .settings-content {
-    width: 240px;
-    margin: 80px auto;
+  max-width: 600px;
+  width: 95vw;
+  margin: 1em auto;
 }
 
 .settings h2 {
@@ -183,6 +194,7 @@
 }
 
 .toggle-set {
+    margin: 1em;
     display: flex;
     align-items: center;
     justify-content: space-between;

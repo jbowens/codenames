@@ -1,9 +1,15 @@
 import * as React from 'react'
 
-const settingToggles = [{
-  name: 'Color-blind mode',
-  setting: 'colorBlind',
-}]
+const settingToggles = [
+  {
+    name: 'Color-blind mode',
+    setting: 'colorBlind',
+  },
+  {
+    name: 'Dark mode',
+    setting: 'darkMode',
+  }
+]
 
 export class Settings {
   static load() {
