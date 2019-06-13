@@ -140,12 +140,12 @@
     border: 2px dashed #d13030;
 }
 
-.color-blind .codemaster .red.hidden-word, .color-blind .red.revealed {
+.color-blind.codemaster .red.hidden-word, .color-blind .red.revealed {
     outline: 2px dashed #d13030;
     border: 1px solid white;
 }
 
-.color-blind .codemaster .blue.hidden-word, .color-blind .blue.revealed {
+.color-blind.codemaster .blue.hidden-word, .color-blind .blue.revealed {
     outline: 2px solid #4183cc;
     border: 1px solid white;
 }
