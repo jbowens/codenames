@@ -84,13 +84,20 @@
 }
 
 .cell {
-    width: 130px;
-    height: 90px;
-    box-sizing: border-box;
-    line-height: 90px;
-    margin: 5px;
-    display: inline-block;
-    text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 19%;
+  height: 18%;
+}
+
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 700px;
+  height: 500px;
 }
 
 .player .board .hidden-word { cursor: pointer; }
