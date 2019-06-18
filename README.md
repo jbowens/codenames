@@ -7,3 +7,23 @@ Codenames implements a web app for generating and displaying boards for the <a h
 A hosted version of the app is available at [www.horsepaste.com](https://www.horsepaste.com).
 
 ![Spymaster view of board](https://raw.githubusercontent.com/jbowens/codenames/master/screenshot.png)
+
+
+### Docker Image
+You can build the docker image of this app.
+
+```
+docker build . -t codenames:latest
+```
+
+The following command will launch the docker image:
+
+```
+docker run --name codenames_server --rm -p 9091:9091 -d codenames
+```
+
+The following command will kill the docker instance:
+
+```
+docker stop codenames_server
+```
