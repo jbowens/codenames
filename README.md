@@ -8,9 +8,24 @@ A hosted version of the app is available at [www.horsepaste.com](https://www.hor
 
 ![Spymaster view of board](https://raw.githubusercontent.com/jbowens/codenames/master/screenshot.png)
 
+## Building
 
-### Docker Image
-You can build the docker image of this app.
+The app requires a [Go](https://golang.org/) toolchain, node.js and [parcel](https://parceljs.org/) to build. Once you have those setup, build the application Go binary with:
+
+```
+go install github.com/jbowens/codenames/cmd/codenames
+```
+
+Then from the frontend directory, build the frontend with:
+
+```
+npm install
+./build.sh
+```
+
+### Docker
+
+Alternatively, the reposotiry includes a Dockerfile for building a docker image of this app.
 
 ```
 docker build . -t codenames:latest
