@@ -74,9 +74,6 @@ export class Game extends React.Component{
 
   public guess(e, idx, word) {
     e.preventDefault();
-    if (this.state.codemaster) {
-      return; // ignore if codemaster view
-    }
     if (this.state.game.revealed[idx]) {
       return; // ignore if already revealed
     }

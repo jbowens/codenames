@@ -103,7 +103,7 @@
   height: 500px;
 }
 
-.player .board .hidden-word { cursor: pointer; }
+.board .hidden-word { cursor: pointer; }
 .board .neutral.revealed { background: #EDE2CC; }
 
 .cell .word {
