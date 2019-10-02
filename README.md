@@ -16,11 +16,22 @@ The app requires a [Go](https://golang.org/) toolchain, node.js and [parcel](htt
 go install github.com/jbowens/codenames/cmd/codenames
 ```
 
-Then from the frontend directory, build the frontend with:
+Then from the frontend directory, install the node modules:
 
 ```
 npm install
-./build.sh
+```
+
+and start the app (listens to changes)
+
+```
+npm start
+```
+
+or build the app
+
+```
+npm run build
 ```
 
 ### Docker
