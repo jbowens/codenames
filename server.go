@@ -255,6 +255,8 @@ func (s *Server) Start() error {
 			s.cleanupOldGames()
 		}
 	}()
+
+	fmt.Println("Started server. Available on http://localhost:9091")
 	return s.Server.ListenAndServe()
 }
 
