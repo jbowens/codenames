@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   font-family: 'Roboto', verdana, sans-serif;
 }
@@ -16,15 +17,17 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   text-align: center;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
 }
 
-h1, h2, h3 {
-    font-family: 'Courier New', monospace;
+h1,
+h2,
+h3 {
+  font-family: 'Courier New', monospace;
 }
 
 h2 {
-    font-size: 1.1em;
+  font-size: 1.1em;
 }
 
 p.intro {
@@ -36,87 +39,89 @@ p.intro {
 }
 
 #available-games {
-    width: 500px;
-    margin: 0 auto;
-    font-family: 'Courier New', monospace;
+  width: 500px;
+  margin: 0 auto;
+  font-family: 'Courier New', monospace;
 }
 
 #available-games ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 #available-games ul li {
-    font-size: 1.8em;
-    margin: 0.5em 0;
-    padding: 0.5em;
-    background: #F0F0F0;
+  font-size: 1.8em;
+  margin: 0.5em 0;
+  padding: 0.5em;
+  background: #f0f0f0;
 }
 
 #available-games ul li:hover {
-    background: #A5E5FA;
-    cursor: pointer;
+  background: #a5e5fa;
+  cursor: pointer;
 }
 
 #new-game {
-    margin: 0 auto 100px auto;
+  margin: 0 auto 100px auto;
 }
 
 #new-game input#game-name {
-    height: 50px;
-    width: 350px;
-    padding: 5px 10px;
-    font-size: 1.3em;
-    border: 1px #DDD solid;
-    letter-spacing: 0.1em;
+  height: 50px;
+  width: 350px;
+  padding: 5px 10px;
+  font-size: 1.3em;
+  border: 1px #ddd solid;
+  letter-spacing: 0.1em;
 }
 
 #new-game button {
-    height: 62px;
-    width: 120px;
-    padding: 5px 10px;
-    background: #85DE6F;
-    border: 1px #DDD solid;
-    font-size: 1em;
-    vertical-align: top;
-    text-transform: uppercase;
-    cursor: pointer;
+  height: 62px;
+  width: 120px;
+  padding: 5px 10px;
+  background: #85de6f;
+  border: 1px #ddd solid;
+  font-size: 1em;
+  vertical-align: top;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 #new-game-options {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 .btn-configured-word-set {
-    color: #AAA;
-    font-family: verdana, sans-serif;
-    font-size: 0.8em;
-    cursor: pointer;
-    display: flex;
-    flex-wrap: nowrap;
+  color: #aaa;
+  font-family: verdana, sans-serif;
+  font-size: 0.8em;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: nowrap;
 }
 
-.btn-configured-word-set .label { flex-grow: 1; }
+.btn-configured-word-set .label {
+  flex-grow: 1;
+}
 
 #new-game-options textarea {
-    width: 100%;
-    height: 25em;
-    margin: 0.5em 0;
-    font-size: 0.6em;
-    border: 1px #DDD solid;
-    font-family: "verdana", sans-serif;
-    line-height: 2em;
-    text-transform: uppercase;
+  width: 100%;
+  height: 25em;
+  margin: 0.5em 0;
+  font-size: 0.6em;
+  border: 1px #ddd solid;
+  font-family: 'verdana', sans-serif;
+  line-height: 2em;
+  text-transform: uppercase;
 }
 
 .btn-configured-word-set .symbol {
-    width: 1em;
-    display: inline-block;
+  width: 1em;
+  display: inline-block;
 }
 .btn-configured-word-set .warning {
-    color: #aa2a16;
+  color: #aa2a16;
 }
 .btn-configured-word-set:hover .label {
-    color: #333;
+  color: #333;
 }
