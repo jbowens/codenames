@@ -91,6 +91,16 @@ p.intro {
   margin-top: 1em;
 }
 
+.language-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.language-group input {
+  margin-right: 0.4rem;
+}
+
 .btn-configured-word-set {
   color: #aaa;
   font-family: verdana, sans-serif;
@@ -124,4 +134,8 @@ p.intro {
 }
 .btn-configured-word-set:hover .label {
   color: #333;
+}
+
+.dropdown-label {
+  display: flex;
 }
