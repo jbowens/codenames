@@ -139,17 +139,3 @@ p.intro {
 .dropdown-label {
   display: flex;
 }
-
-#banner {
-  width: 500px;
-  margin: 0 auto 3em auto;
-  font-size: 0.9em;
-  border-radius: 0.5em;
-  padding: 1em;
-  background: #e1f4d0;
-}
-
-#banner a {
-  color: #000;
-  font-weight: bold;
-}
