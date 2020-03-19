@@ -11,7 +11,7 @@ COPY . /app
 WORKDIR /app
 
 # Get the go app
-RUN go get -u github.com/jbowens/codenames
+RUN go get -u github.com/fabricemrchl/codenames
 
 # Build backend and frontend 
 RUN go build cmd/codenames/main.go && \
