@@ -130,6 +130,14 @@ export class Game extends React.Component {
 
   public nextGame(e) {
     e.preventDefault();
+    // Ask for confirmation when current game hasn't finished
+    let allowNextGame = (
+      this.state.game.winning_team ||
+      confirm("Do you really want to start a new game?")
+    );
+    if (!allowNextGame) {
+      return;
+    }
     $.post(
       '/next-game',
       JSON.stringify({
