@@ -296,6 +296,7 @@ export class Game extends React.Component {
             Next game
           </button>
         </form>
+        <div id="coffee"><a href="https://www.buymeacoffee.com/jbowens">Buy the developer a coffee.</a></div>
       </div>
     );
   }
