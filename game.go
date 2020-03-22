@@ -61,10 +61,11 @@ func (t Team) Repeat(n int) []Team {
 // a Game's state. It's used to recreate games after
 // a process restart.
 type GameState struct {
-	Seed     int64    `json:"seed"`
-	Round    int      `json:"round"`
-	Revealed []bool   `json:"revealed"`
-	WordSet  []string `json:"word_set"`
+	Seed           int64    `json:"seed"`
+	SpymasterCount int      `json:"spymaster_count"`
+	Round          int      `json:"round"`
+	Revealed       []bool   `json:"revealed"`
+	WordSet        []string `json:"word_set"`
 }
 
 func (gs GameState) ID() string {
@@ -97,9 +98,10 @@ func decodeGameState(s string, defaultWords []string) (GameState, bool) {
 
 func randomState(words []string) GameState {
 	return GameState{
-		Seed:     rand.Int63(),
-		Revealed: make([]bool, wordsPerGame),
-		WordSet:  words,
+		Seed:           rand.Int63(),
+		SpymasterCount: 0,
+		Revealed:       make([]bool, wordsPerGame),
+		WordSet:        words,
 	}
 }
 

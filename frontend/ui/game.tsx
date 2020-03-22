@@ -71,7 +71,22 @@ export class Game extends React.Component {
 
   public toggleRole(e, role) {
     e.preventDefault();
-    this.setState({ codemaster: role == 'codemaster' });
+    const newRoleCodemaster = role == 'codemaster';
+    if (this.state.codemaster != newRoleCodemaster) {
+      $.post(
+        '/claim-spymaster',
+        JSON.stringify({
+          game_id: this.state.game.id,
+          state_id: this.state.game.state_id,
+          spymaster: newRoleCodemaster
+        }),
+        g => {
+          this.setState({ codemaster: newRoleCodemaster });
+        }
+      ).fail(function () {
+        alert('There are already two spymasters registered');
+      });
+    }
   }
 
   public guess(e, idx, word) {

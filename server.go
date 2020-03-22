@@ -92,6 +92,42 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	writeGame(rw, g)
 }
 
+// POST /claim-spymaster
+func (s *Server) claimSpymaster(rw http.ResponseWriter, req *http.Request) {
+	var request struct {
+		GameID    string `json:"game_id"`
+		StateID   string `json:"state_id"`
+		Spymaster bool   `json: "spymaster"`
+	}
+
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&request); err != nil {
+		http.Error(rw, "Error decoding", 400)
+		return
+	}
+	
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	
+	g, ok := s.getGame(request.GameID, request.StateID)
+	if !ok {
+		http.Error(rw, "No such game", 404)
+		return
+	}
+	
+	if request.Spymaster {
+		if g.GameState.SpymasterCount > 1 {
+			http.Error(rw, "Too many spymasters", 400)
+		} else {
+			g.GameState.SpymasterCount += 1
+		}
+	} else {
+		g.GameState.SpymasterCount -= 1
+	}
+
+	writeGame(rw, g)
+}
+
 // POST /guess
 func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
@@ -243,6 +279,7 @@ func (s *Server) Start() error {
 	s.mux.HandleFunc("/guess", s.handleGuess)
 	s.mux.HandleFunc("/game/", s.handleRetrieveGame)
 	s.mux.HandleFunc("/game-state", s.handleGameState)
+	s.mux.HandleFunc("/claim-spymaster", s.claimSpymaster)
 	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/dist"))))
 	s.mux.HandleFunc("/", s.handleIndex)
 
