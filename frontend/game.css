@@ -308,3 +308,11 @@
 .toggle-state {
   font-weight: bold;
 }
+
+#coffee {
+    margin-top: 2em;
+    text-align: right;
+    font-size: 0.8em;
+}
+#coffee a { color: #f0f0f0; }
+.color-blind #coffee a { color: #000; font-weight: bold; }
