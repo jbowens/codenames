@@ -153,9 +153,9 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 
 func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
-		GameID  string   `json:"game_id"`
-		WordSet []string `json:"word_set"`
-		CreateNew bool   `json:"create_new"`
+		GameID    string   `json:"game_id"`
+		WordSet   []string `json:"word_set"`
+		CreateNew bool     `json:"create_new"`
 	}
 
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
@@ -185,7 +185,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 
 	g, ok := s.games[request.GameID]
 	if (!ok || request.CreateNew) {
-		g := newGame(request.GameID, randomState(words))
+		g = newGame(request.GameID, randomState(words))
 		s.games[request.GameID] = g
 	}
 	writeGame(rw, g)
