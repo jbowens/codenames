@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"codenames"
+	"github.com/jbowens/codenames"
 )
 
 func main() {
