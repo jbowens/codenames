@@ -20,8 +20,8 @@ import (
 
 type Server struct {
 	Server http.Server
-	tpl    *template.Template
 
+	tpl         *template.Template
 	gameIDWords []string
 
 	mu           sync.Mutex
@@ -31,6 +31,12 @@ type Server struct {
 }
 
 func (s *Server) getGame(gameID, stateID string) (*Game, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.getGameLocked(gameID, stateID)
+}
+
+func (s *Server) getGameLocked(gameID, stateID string) (*Game, bool) {
 	g, ok := s.games[gameID]
 	if ok {
 		return g, ok
@@ -57,7 +63,7 @@ func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	gameID := path.Base(req.URL.Path)
-	g, ok := s.getGame(gameID, req.Form.Get("state_id"))
+	g, ok := s.getGameLocked(gameID, req.Form.Get("state_id"))
 	if ok {
 		writeGame(rw, g)
 		return
@@ -81,14 +87,16 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	s.mu.Lock()
-	defer s.mu.Unlock()
-	g, ok := s.getGame(body.GameID, body.StateID)
+	g, ok := s.getGameLocked(body.GameID, body.StateID)
 	if ok {
+		s.mu.Unlock()
 		writeGame(rw, g)
 		return
 	}
+
 	g = newGame(body.GameID, randomState(s.defaultWords))
 	s.games[body.GameID] = g
+	s.mu.Unlock()
 	writeGame(rw, g)
 }
 
@@ -105,9 +113,6 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Error decoding", 400)
 		return
 	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
 
 	g, ok := s.getGame(request.GameID, request.StateID)
 	if !ok {
@@ -134,9 +139,6 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Error decoding", 400)
 		return
 	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
 
 	g, ok := s.getGame(request.GameID, request.StateID)
 	if !ok {
@@ -184,7 +186,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	g, ok := s.games[request.GameID]
-	if (!ok || request.CreateNew) {
+	if !ok || request.CreateNew {
 		g = newGame(request.GameID, randomState(words))
 		s.games[request.GameID] = g
 	}
@@ -213,16 +215,15 @@ func (s *Server) cleanupOldGames() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for id, g := range s.games {
+		g.mu.Lock()
 		if g.WinningTeam != nil && g.CreatedAt.Add(3*time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			fmt.Printf("Removed completed game %s\n", id)
-			continue
-		}
-		if g.CreatedAt.Add(12 * time.Hour).Before(time.Now()) {
+		} else if g.CreatedAt.Add(12 * time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			fmt.Printf("Removed expired game %s\n", id)
-			continue
 		}
+		g.mu.Unlock()
 	}
 }
 
