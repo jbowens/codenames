@@ -62,10 +62,11 @@ func (t Team) Repeat(n int) []Team {
 // a Game's state. It's used to recreate games after
 // a process restart.
 type GameState struct {
-	Seed     int64    `json:"seed"`
-	Round    int      `json:"round"`
-	Revealed []bool   `json:"revealed"`
-	WordSet  []string `json:"word_set"`
+	Seed       int64    `json:"seed"`
+	PermIndex  int      `json:"seed_index"`
+	Round      int      `json:"round"`
+	Revealed   []bool   `json:"revealed"`
+	WordSet    []string `json:"word_set"`
 }
 
 func (gs GameState) ID() string {
@@ -98,9 +99,10 @@ func decodeGameState(s string, defaultWords []string) (GameState, bool) {
 
 func randomState(words []string) GameState {
 	return GameState{
-		Seed:     rand.Int63(),
-		Revealed: make([]bool, wordsPerGame),
-		WordSet:  words,
+		Seed:      rand.Int63(),
+		PermIndex: 0,
+		Revealed:  make([]bool, wordsPerGame),
+		WordSet:   words,
 	}
 }
 
@@ -208,25 +210,30 @@ func (g *Game) currentTeam() Team {
 }
 
 func newGame(id string, state GameState) *Game {
+	// Reset seed and index if game has exhausted all words
+	if (state.PermIndex + wordsPerGame >= len(state.WordSet)) {
+		state = randomState(state.WordSet)
+	}
+
 	rnd := rand.New(rand.NewSource(state.Seed))
 	game := &Game{
 		ID:           id,
 		CreatedAt:    time.Now(),
-		StartingTeam: Team(rnd.Intn(2)) + Red,
+		StartingTeam: Team(rand.New(rand.NewSource(rand.Int63())).Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
 		GameState:    state,
 	}
 
-	// Pick 25 random words.
-	used := map[string]struct{}{}
-	for len(used) < wordsPerGame {
-		w := state.WordSet[rnd.Intn(len(state.WordSet))]
-		if _, ok := used[w]; !ok {
-			used[w] = struct{}{}
-			game.Words = append(game.Words, w)
-		}
+	// Pick the next 25 words from the
+	// randomly generated permutation
+	perm := rnd.Perm(len(state.WordSet))
+	permIndex := state.PermIndex
+	for _, i := range perm[permIndex:permIndex + wordsPerGame] {
+		w := state.WordSet[perm[i]]
+		game.Words = append(game.Words, w)
 	}
+	game.GameState.PermIndex = permIndex + wordsPerGame
 
 	// Pick a random permutation of team assignments.
 	var teamAssignments []Team

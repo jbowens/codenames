@@ -186,10 +186,14 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	g, ok := s.games[request.GameID]
-	if !ok || request.CreateNew {
+	state, stateOk := decodeGameState(g.GameState.ID(), s.defaultWords)
+	if !ok || !stateOk {
 		g = newGame(request.GameID, randomState(words))
-		s.games[request.GameID] = g
+	} else {
+		g = newGame(request.GameID, state)
 	}
+	s.games[request.GameID] = g
+
 	writeGame(rw, g)
 }
 
