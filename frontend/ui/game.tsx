@@ -143,7 +143,6 @@ export class Game extends React.Component {
       JSON.stringify({
         game_id: this.state.game.id,
         word_set: this.state.game.word_set,
-        create_new: true,
       }),
       g => {
         this.setState({ game: g, codemaster: false });

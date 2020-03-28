@@ -23,7 +23,6 @@ export const Lobby = ({ defaultGameID }) => {
       JSON.stringify({
         game_id: newGameName,
         word_set: words[selectedLanguage].split(', '),
-        create_new: false,
       }),
       g => {
         const newURL = (document.location.pathname = '/' + newGameName);

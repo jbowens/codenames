@@ -157,7 +157,6 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
 		GameID    string   `json:"game_id"`
 		WordSet   []string `json:"word_set"`
-		CreateNew bool     `json:"create_new"`
 	}
 
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
@@ -186,11 +185,18 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	g, ok := s.games[request.GameID]
-	state, stateOk := decodeGameState(g.GameState.ID(), s.defaultWords)
-	if !ok || !stateOk {
+	if !ok {
+		// new random state game if no game exists
 		g = newGame(request.GameID, randomState(words))
 	} else {
-		g = newGame(request.GameID, state)
+		state, ok := decodeGameState(g.GameState.ID(), s.defaultWords)
+		if !ok {
+			// new random state game if state was invalid
+			g = newGame(request.GameID, randomState(words))
+                } else {
+			// otherwise new game based off current game state
+			g = newGame(request.GameID, state)
+		}
 	}
 	s.games[request.GameID] = g
 
