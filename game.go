@@ -227,7 +227,7 @@ func newGame(id string, state GameState) *Game {
 	// used for generating words
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// used for all other random settings. starting team and shuffling
-        randRnd := rand.New(rand.NewSource(rand.Int63()))
+	randRnd := rand.New(rand.NewSource(rand.Int63()))
 
 	game := &Game{
 		ID:           id,
