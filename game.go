@@ -106,6 +106,15 @@ func randomState(words []string) GameState {
 	}
 }
 
+func resetState(state GameState) GameState {
+	return GameState{
+		Seed:      state.Seed,
+		PermIndex: state.PermIndex,
+		Revealed:  make([]bool, wordsPerGame),
+		WordSet:   state.WordSet,
+	}
+}
+
 type Game struct {
 	GameState
 	ID           string    `json:"id"`
@@ -215,19 +224,23 @@ func newGame(id string, state GameState) *Game {
 		state = randomState(state.WordSet)
 	}
 
-	rnd := rand.New(rand.NewSource(state.Seed))
+	// used for generating words
+	seedRnd := rand.New(rand.NewSource(state.Seed))
+	// used for all other random settings. starting team and shuffling
+        randRnd := rand.New(rand.NewSource(rand.Int63()))
+
 	game := &Game{
 		ID:           id,
 		CreatedAt:    time.Now(),
-		StartingTeam: Team(rand.New(rand.NewSource(rand.Int63())).Intn(2)) + Red,
+		StartingTeam: Team(randRnd.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
-		GameState:    state,
+		GameState:    resetState(state),
 	}
 
 	// Pick the next 25 words from the
 	// randomly generated permutation
-	perm := rnd.Perm(len(state.WordSet))
+	perm := seedRnd.Perm(len(state.WordSet))
 	permIndex := state.PermIndex
 	for _, i := range perm[permIndex:permIndex + wordsPerGame] {
 		w := state.WordSet[perm[i]]
@@ -243,9 +256,9 @@ func newGame(id string, state GameState) *Game {
 	teamAssignments = append(teamAssignments, Black)
 	teamAssignments = append(teamAssignments, game.StartingTeam)
 
-	shuffleCount := rnd.Intn(5) + 5
+	shuffleCount := randRnd.Intn(5) + 5
 	for i := 0; i < shuffleCount; i++ {
-		shuffle(rnd, teamAssignments)
+		shuffle(randRnd, teamAssignments)
 	}
 	game.Layout = teamAssignments
 	return game
