@@ -194,21 +194,33 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 }
 
 type statsResponse struct {
-	InProgress int `json:"games_in_progress"`
+	GamesTotal          int `json:"games_total"`
+	GamesInProgress     int `json:"games_in_progress"`
+	GamesCreatedOneHour int `json:"games_created_1h"`
 }
 
 func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
-	var inProgress int
+	hourAgo := time.Now().Add(-time.Hour)
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	var inProgress, createdWithinAnHour int
 	for _, g := range s.games {
-		if g.WinningTeam == nil {
+		g.mu.Lock()
+		if g.WinningTeam == nil && g.anyRevealed() {
 			inProgress++
 		}
+		if hourAgo.Before(g.CreatedAt) {
+			createdWithinAnHour++
+		}
+		g.mu.Unlock()
 	}
-	writeJSON(rw, statsResponse{inProgress})
+	writeJSON(rw, statsResponse{
+		GamesTotal:          len(s.games),
+		GamesInProgress:     inProgress,
+		GamesCreatedOneHour: createdWithinAnHour,
+	})
 }
 
 func (s *Server) cleanupOldGames() {

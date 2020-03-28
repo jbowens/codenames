@@ -77,6 +77,14 @@ func (gs GameState) ID() string {
 	return base64.URLEncoding.EncodeToString(buf.Bytes())
 }
 
+func (gs GameState) anyRevealed() bool {
+	var revealed bool
+	for _, r := range gs.Revealed {
+		revealed = revealed || r
+	}
+	return revealed
+}
+
 func decodeGameState(s string, defaultWords []string) (GameState, bool) {
 	data, err := base64.URLEncoding.DecodeString(s)
 	if err != nil {
