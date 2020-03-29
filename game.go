@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 )
 
@@ -44,6 +43,26 @@ func (t Team) Other() Team {
 		return Red
 	}
 	return t
+}
+
+func (t *Team) UnmarshalJSON(b []byte) error {
+	var s string
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+
+	switch s {
+	case "red":
+		*t = Red
+	case "blue":
+		*t = Blue
+	case "black":
+		*t = Black
+	default:
+		*t = Neutral
+	}
+	return nil
 }
 
 func (t Team) MarshalJSON() ([]byte, error) {
@@ -120,28 +139,6 @@ type Game struct {
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
-
-	mu        sync.Mutex
-	marshaled []byte
-}
-
-type noCachedMarshal Game
-
-// MarshalJSON implements the encoding/json.Marshaler interface.
-// It caches a marshalled value of the game object.
-func (g *Game) MarshalJSON() ([]byte, error) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
-	var err error
-	if g.marshaled == nil {
-		// Marshal g, wrapping it in the `noCachedMarshal` type
-		// to erase this custom json.Marshaler implementation.
-		uncached := noCachedMarshal(*g)
-		g.marshaled, err = json.Marshal(uncached)
-	}
-
-	return g.marshaled, err
 }
 
 func (g *Game) checkWinningCondition() {
@@ -171,10 +168,6 @@ func (g *Game) checkWinningCondition() {
 }
 
 func (g *Game) NextTurn() error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-	g.marshaled = nil
-
 	if g.WinningTeam != nil {
 		return errors.New("game is already over")
 	}
@@ -183,10 +176,6 @@ func (g *Game) NextTurn() error {
 }
 
 func (g *Game) Guess(idx int) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-	g.marshaled = nil
-
 	if idx > len(g.Layout) || idx < 0 {
 		return fmt.Errorf("index %d is invalid", idx)
 	}
