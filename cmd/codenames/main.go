@@ -14,7 +14,7 @@ import (
 )
 
 const listenAddr = ":9091"
-const expiryDur = -24 * time.Hour
+const expiryDur = -12 * time.Hour
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
