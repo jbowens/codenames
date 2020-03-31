@@ -54,14 +54,18 @@ export class Game extends React.Component {
     }
 
     const body = { game_id: this.props.gameID };
-    if (this.state.game && this.state.game.state_id) {
-      body.state_id = this.state.game.state_id;
-    }
-    $.post('/game-state', JSON.stringify(body), data => {
-      if (this.state.game && data.created_at != this.state.game.created_at) {
-        this.setState({ codemaster: false });
-      }
-      this.setState({ game: data });
+    $.ajax({
+      url: '/game-state',
+      type: 'POST',
+      data: JSON.stringify(body),
+      contentType:'application/json; charset=utf-8',
+      dataType: 'json',
+      success: (data => {
+        if (this.state.game && data.created_at != this.state.game.created_at) {
+          this.setState({ codemaster: false });
+        }
+        this.setState({ game: data });
+      }),
     });
 
     setTimeout(() => {
@@ -86,7 +90,6 @@ export class Game extends React.Component {
       '/guess',
       JSON.stringify({
         game_id: this.state.game.id,
-        state_id: this.state.game.state_id,
         index: idx,
       }),
       g => {
@@ -118,10 +121,7 @@ export class Game extends React.Component {
   public endTurn() {
     $.post(
       '/end-turn',
-      JSON.stringify({
-        game_id: this.state.game.id,
-        state_id: this.state.game.state_id,
-      }),
+      JSON.stringify({ game_id: this.state.game.id }),
       g => {
         this.setState({ game: g });
       }
