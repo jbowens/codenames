@@ -16,8 +16,7 @@ RUN cp *.go /go/src/codenames/
 RUN go get
 
 # Build backend and frontend 
-RUN go build /go/src/codenames && \
-    go build /app/cmd/codenames/main.go && \
+RUN go build /app/cmd/codenames/main.go && \
     cd /app/frontend/ && \
     npm install && \
     sh build.sh
