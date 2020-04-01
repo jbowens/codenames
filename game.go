@@ -81,11 +81,11 @@ func (t Team) Repeat(n int) []Team {
 // a Game's state. It's used to recreate games after
 // a process restart.
 type GameState struct {
-	Seed 			int64 		`json:"seed"`
-	PermIndex int 			`json:"perm_index"`
-	Round 		int 			`json:"round"`
-	Revealed 	[]bool 		`json:"revealed"`
-	WordSet 	[]string 	`json:"word_set"`
+	Seed      int64     `json:"seed"`
+	PermIndex int       `json:"perm_index"`
+	Round     int       `json:"round"`
+	Revealed  []bool    `json:"revealed"`
+	WordSet   []string  `json:"word_set"`
 }
 
 func (gs GameState) ID() string {
