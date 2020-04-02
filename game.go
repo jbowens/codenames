@@ -216,15 +216,10 @@ func (g *Game) currentTeam() Team {
 }
 
 func newGame(id string, state GameState) *Game {
-	// Reset seed and index if game has exhausted all words
-	if (state.PermIndex + wordsPerGame >= len(state.WordSet)) {
-		state = randomState(state.WordSet)
-	}
-
-	// used for generating words, consistent randomness across games
+	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
-	// used for all other random settings. starting team and shuffling
-	randRnd := rand.New(rand.NewSource(rand.Int63()))
+	// distinct randomness across games with same seed
+	randRnd := rand.New(rand.NewSource(state.Seed * int64(state.PermIndex)))
 
 	game := &Game{
 		ID:           id,
