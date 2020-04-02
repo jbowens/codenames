@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/pprof"
 	"os"
-	"path"
 	"sort"
 	"strings"
 	"sync"
@@ -96,30 +95,6 @@ func (s *Server) getGameLocked(gameID, stateID string) (*GameHandle, bool) {
 	gh = newHandle(newGame(gameID, state), s.Store)
 	s.games[gameID] = gh
 	return gh, true
-}
-
-// GET /game/<id>
-// (deprecated: use POST /game-state instead)
-func (s *Server) handleRetrieveGame(rw http.ResponseWriter, req *http.Request) {
-	err := req.ParseForm()
-	if err != nil {
-		http.Error(rw, "Error decoding query string", 400)
-		return
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	gameID := path.Base(req.URL.Path)
-	gh, ok := s.getGameLocked(gameID, req.Form.Get("state_id"))
-	if ok {
-		writeGame(rw, gh)
-		return
-	}
-
-	gh = newHandle(newGame(gameID, randomState(s.defaultWords)), s.Store)
-	s.games[gameID] = gh
-	writeGame(rw, gh)
 }
 
 // POST /game-state
@@ -314,7 +289,6 @@ func (s *Server) Start(games map[string]*Game) error {
 	s.mux.HandleFunc("/next-game", s.handleNextGame)
 	s.mux.HandleFunc("/end-turn", s.handleEndTurn)
 	s.mux.HandleFunc("/guess", s.handleGuess)
-	s.mux.HandleFunc("/game/", s.handleRetrieveGame)
 	s.mux.HandleFunc("/game-state", s.handleGameState)
 	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/dist"))))
 	s.mux.HandleFunc("/", s.handleIndex)
