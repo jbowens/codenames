@@ -246,12 +246,12 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		// no game exists, create for the first time
 		gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
 	} else if request.CreateNew {
-		// otherwise if exists and create new use previous state to generate new game
 		state := gh.g.GameState
-		// Reset seed and index if game has exhausted all words
 		if (state.PermIndex + wordsPerGame >= len(state.WordSet)) {
+			// reset seed and index if game has exhausted all words
 			state = randomState(state.WordSet)
 		} else {
+			// otherwise increment perm index
 			state.PermIndex = state.PermIndex + wordsPerGame
 		}
 		gh = newHandle(newGame(request.GameID, state), s.Store)
