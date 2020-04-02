@@ -238,7 +238,6 @@ func newGame(id string, state GameState) *Game {
 		w := state.WordSet[perm[i]]
 		game.Words = append(game.Words, w)
 	}
-	game.GameState.PermIndex = permIndex + wordsPerGame
 
 	// Pick a random permutation of team assignments.
 	var teamAssignments []Team

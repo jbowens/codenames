@@ -251,6 +251,8 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		// Reset seed and index if game has exhausted all words
 		if (state.PermIndex + wordsPerGame >= len(state.WordSet)) {
 			state = randomState(state.WordSet)
+		} else {
+			state.PermIndex = state.PermIndex + wordsPerGame
 		}
 		gh = newHandle(newGame(request.GameID, state), s.Store)
 	}
