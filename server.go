@@ -243,17 +243,11 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 
 	gh, ok := s.games[request.GameID]
 	if !ok {
-		// new random state game if no game exists
+		// no game exists, create for the first time
 		gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
-	} else {
-		state, ok := decodeGameState(gh.g.GameState.ID(), s.defaultWords)
-		if !ok {
-			// new random state game if state was invalid
-			gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
-		} else if ok && request.CreateNew {
-			// otherwise new game based off current game state if CreateNew
-			gh = newHandle(newGame(request.GameID, state), s.Store)
-		}
+	} else if request.CreateNew {
+		// otherwise if exists and create new use previous state to generate new game
+		gh = newHandle(newGame(request.GameID, gh.g.GameState), s.Store)
 	}
 	s.games[request.GameID] = gh
 	writeGame(rw, gh)
