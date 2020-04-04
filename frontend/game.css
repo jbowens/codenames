@@ -4,18 +4,29 @@
   margin: 0 auto;
 }
 
-#share {
-  color: #888;
-  margin-bottom: 2em;
-  font-size: 0.8em;
-  padding-bottom: 2em;
-  border-bottom: 1px #eee solid;
+#infoContent {
   font-family: system, -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
     'Lucida Grande';
+  border-bottom: 1px #eee solid;
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 2em;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1em;
+}
+
+#share {
+  color: #888;
+  font-size: 0.8em;
 }
 
 #share .url {
   color: #888;
+}
+
+#timer {
+  font-size: 3em;
 }
 
 #status-line {
@@ -310,9 +321,16 @@
 }
 
 #coffee {
-    margin-top: 2em;
-    text-align: right;
-    font-size: 0.8em;
+  margin-top: 2em;
+  text-align: right;
+  font-size: 0.8em;
+}
+#coffee a {
+  color: #f0f0f0;
+}
+.color-blind #coffee a {
+  color: #000;
+  font-weight: bold;
 }
 #coffee a { color: #888; }
 .color-blind #coffee a { font-weight: bold; }

@@ -124,6 +124,7 @@ type Game struct {
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
+	EndTime      time.Time `json:"end_time"`
 }
 
 func (g *Game) StateID() string {
@@ -162,6 +163,7 @@ func (g *Game) NextTurn() error {
 	}
 	g.UpdatedAt = time.Now()
 	g.Round++
+	g.EndTime = getEndTime(1, 0)
 	return nil
 }
 
@@ -195,6 +197,10 @@ func (g *Game) currentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
+func getEndTime(minutes int, seconds int) time.Time {
+	return time.Now().Add(time.Minute * time.Duration(minutes)).Add(time.Second * time.Duration(seconds))
+}
+
 func newGame(id string, state GameState) *Game {
 	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
@@ -209,6 +215,7 @@ func newGame(id string, state GameState) *Game {
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
 		GameState:    state,
+		EndTime:      getEndTime(1, 0),
 	}
 
 	// Pick the next `wordsPerGame` words from the
