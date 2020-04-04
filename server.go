@@ -354,17 +354,7 @@ func basicAuth(handler http.Handler, password, realm string) http.Handler {
 }
 
 func writeGame(rw http.ResponseWriter, gh *GameHandle) {
-	// TODO: this is a temporary hack. we can get rid of the
-	// state ID altogether once we're using pebble to persist
-	// games on disk.
-	gh.mu.Lock()
-	stateID := gh.g.GameState.ID()
-	gh.mu.Unlock()
-
-	writeJSON(rw, struct {
-		*GameHandle
-		StateID string `json:"state_id"`
-	}{gh, stateID})
+	writeJSON(rw, gh)
 }
 
 func writeJSON(rw http.ResponseWriter, resp interface{}) {
