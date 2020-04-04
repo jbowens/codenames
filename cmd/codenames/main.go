@@ -65,8 +65,12 @@ func main() {
 
 	log.Printf("[STARTUP] Listening on addr %s\n", listenAddr)
 	server := &codenames.Server{
-		Server: http.Server{Addr: listenAddr},
-		Store:  ps,
+		Server: http.Server{
+			Addr:         listenAddr,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 3 * time.Second,
+		},
+		Store: ps,
 	}
 	if err := server.Start(games); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
