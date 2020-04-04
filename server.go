@@ -77,22 +77,18 @@ func (gh *GameHandle) MarshalJSON() ([]byte, error) {
 	return gh.marshaled, err
 }
 
-func (s *Server) getGame(gameID, stateID string) (*GameHandle, bool) {
+func (s *Server) getGame(gameID string) (*GameHandle, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.getGameLocked(gameID, stateID)
+	return s.getGameLocked(gameID)
 }
 
-func (s *Server) getGameLocked(gameID, stateID string) (*GameHandle, bool) {
+func (s *Server) getGameLocked(gameID string) (*GameHandle, bool) {
 	gh, ok := s.games[gameID]
 	if ok {
 		return gh, ok
 	}
-	state, ok := decodeGameState(stateID, s.defaultWords)
-	if !ok {
-		return nil, false
-	}
-	gh = newHandle(newGame(gameID, state), s.Store)
+	gh = newHandle(newGame(gameID, randomState(s.defaultWords)), s.Store)
 	s.games[gameID] = gh
 	return gh, true
 }
@@ -100,8 +96,7 @@ func (s *Server) getGameLocked(gameID, stateID string) (*GameHandle, bool) {
 // POST /game-state
 func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	var body struct {
-		GameID  string `json:"game_id"`
-		StateID string `json:"state_id"`
+		GameID string `json:"game_id"`
 	}
 	err := json.NewDecoder(req.Body).Decode(&body)
 	if err != nil {
@@ -110,7 +105,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	s.mu.Lock()
-	gh, ok := s.getGameLocked(body.GameID, body.StateID)
+	gh, ok := s.getGameLocked(body.GameID)
 	if ok {
 		s.mu.Unlock()
 		writeGame(rw, gh)
@@ -126,9 +121,8 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 // POST /guess
 func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
-		GameID  string `json:"game_id"`
-		StateID string `json:"state_id"`
-		Index   int    `json:"index"`
+		GameID string `json:"game_id"`
+		Index  int    `json:"index"`
 	}
 
 	decoder := json.NewDecoder(req.Body)
@@ -137,7 +131,7 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	gh, ok := s.getGame(request.GameID, request.StateID)
+	gh, ok := s.getGame(request.GameID)
 	if !ok {
 		http.Error(rw, "No such game", 404)
 		return
@@ -157,8 +151,7 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 // POST /end-turn
 func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
-		GameID  string `json:"game_id"`
-		StateID string `json:"state_id"`
+		GameID string `json:"game_id"`
 	}
 
 	decoder := json.NewDecoder(req.Body)
@@ -167,7 +160,7 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	gh, ok := s.getGame(request.GameID, request.StateID)
+	gh, ok := s.getGame(request.GameID)
 	if !ok {
 		http.Error(rw, "No such game", 404)
 		return
@@ -204,23 +197,27 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	var gh *GameHandle
+	func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
 
-	words := s.defaultWords
-	if len(wordSet) > 0 {
-		words = nil
-		for w := range wordSet {
-			words = append(words, w)
+		words := s.defaultWords
+		if len(wordSet) > 0 {
+			words = nil
+			for w := range wordSet {
+				words = append(words, w)
+			}
+			sort.Strings(words)
 		}
-		sort.Strings(words)
-	}
 
-	gh, ok := s.games[request.GameID]
-	if !ok || request.CreateNew {
-		gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
-		s.games[request.GameID] = gh
-	}
+		var ok bool
+		gh, ok = s.games[request.GameID]
+		if !ok || request.CreateNew {
+			gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
+			s.games[request.GameID] = gh
+		}
+	}()
 	writeGame(rw, gh)
 }
 

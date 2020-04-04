@@ -1,9 +1,6 @@
 package codenames
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -87,40 +84,12 @@ type GameState struct {
 	WordSet  []string `json:"word_set"`
 }
 
-func (gs GameState) ID() string {
-	var buf bytes.Buffer
-	err := gob.NewEncoder(&buf).Encode(gs)
-	if err != nil {
-		return ""
-	}
-	return base64.URLEncoding.EncodeToString(buf.Bytes())
-}
-
 func (gs GameState) anyRevealed() bool {
 	var revealed bool
 	for _, r := range gs.Revealed {
 		revealed = revealed || r
 	}
 	return revealed
-}
-
-func decodeGameState(s string, defaultWords []string) (GameState, bool) {
-	data, err := base64.URLEncoding.DecodeString(s)
-	if err != nil {
-		return GameState{}, false
-	}
-	var state GameState
-	err = gob.NewDecoder(bytes.NewReader(data)).Decode(&state)
-	if err != nil {
-		return GameState{}, false
-	}
-	if len(state.WordSet) == 0 {
-		state.WordSet = defaultWords
-	}
-	if len(state.WordSet) < 25 {
-		return GameState{}, false
-	}
-	return state, true
 }
 
 func randomState(words []string) GameState {
