@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/trace"
 	"time"
 
 	"github.com/cockroachdb/pebble"
@@ -56,6 +58,11 @@ func main() {
 	}
 	log.Printf("[STARTUP] Restored %d games from disk.\n", len(games))
 
+	if traceDir := os.Getenv("TRACE"); len(traceDir) > 0 {
+		log.Printf("[STARTUP] Traces enabled; storing most recent trace in %q", traceDir)
+		go tracePeriodically(traceDir)
+	}
+
 	log.Printf("[STARTUP] Listening on addr %s\n", listenAddr)
 	server := &codenames.Server{
 		Server: http.Server{Addr: listenAddr},
@@ -72,5 +79,32 @@ func deleteExpiredPeriodically(ps *codenames.PebbleStore) {
 		if err != nil {
 			log.Printf("PebbleStore.DeletedExpired: %s\n", err)
 		}
+	}
+}
+
+func tracePeriodically(dst string) {
+	for range time.Tick(time.Minute) {
+		takeTrace(dst)
+	}
+}
+
+func takeTrace(dst string) {
+	f, err := ioutil.TempFile("", "trace")
+	if err != nil {
+		log.Printf("[TRACE] error creating temp file: %s", err)
+		return
+	}
+	defer f.Close()
+
+	err = trace.Start(f)
+	if err != nil {
+		log.Printf("[TRACE] error starting trace: %s", err)
+		return
+	}
+	<-time.After(10 * time.Second)
+	trace.Stop()
+	err = os.Rename(f.Name(), dst)
+	if err != nil {
+		log.Printf("[TRACE] error renaming trace: %s", err)
 	}
 }
