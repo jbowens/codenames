@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ToggleSet from '~/ui/toggle-set';
 
 const settingToggles = [
   {
@@ -88,24 +89,12 @@ export class SettingsPanel extends React.Component {
           <h2>SETTINGS</h2>
           <div className="toggles">
             {settingToggles.map(toggle => (
-              <div className="toggle-set" key={toggle.setting}>
-                <div className="settings-label">
-                  {toggle.name}{' '}
-                  <span className={'toggle-state'}>
-                    {this.props.values[toggle.setting] ? 'ON' : 'OFF'}
-                  </span>
-                </div>
-                <div
-                  onClick={e => this.props.toggle(e, toggle.setting)}
-                  className={
-                    this.props.values[toggle.setting]
-                      ? 'toggle active'
-                      : 'toggle inactive'
-                  }
-                >
-                  <div className="switch"></div>
-                </div>
-              </div>
+              <ToggleSet
+                key={toggle.name}
+                values={this.props.values}
+                toggle={toggle}
+                handleToggle={this.props.toggle}
+              />
             ))}
           </div>
         </div>
