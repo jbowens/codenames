@@ -78,11 +78,11 @@ func (t Team) Repeat(n int) []Team {
 // a Game's state. It's used to recreate games after
 // a process restart.
 type GameState struct {
-	Seed      int64     `json:"seed"`
-	PermIndex int       `json:"perm_index"`
-	Round     int       `json:"round"`
-	Revealed  []bool    `json:"revealed"`
-	WordSet   []string  `json:"word_set"`
+	Seed      int64    `json:"seed"`
+	PermIndex int      `json:"perm_index"`
+	Round     int      `json:"round"`
+	Revealed  []bool   `json:"revealed"`
+	WordSet   []string `json:"word_set"`
 }
 
 func (gs GameState) anyRevealed() bool {
@@ -102,13 +102,15 @@ func randomState(words []string) GameState {
 	}
 }
 
-func resetState(state GameState) GameState {
-	return GameState{
-		Seed:      state.Seed,
-		PermIndex: state.PermIndex,
-		Revealed:  make([]bool, wordsPerGame),
-		WordSet:   state.WordSet,
+// nextGameState returns a new GameState for the next game.
+func nextGameState(state GameState) GameState {
+	state.PermIndex = state.PermIndex + wordsPerGame
+	if state.PermIndex+wordsPerGame >= len(state.WordSet) {
+		state.Seed = rand.Int63()
+		state.PermIndex = 0
 	}
+	state.Revealed = make([]bool, wordsPerGame)
+	return state
 }
 
 type Game struct {
@@ -196,14 +198,14 @@ func newGame(id string, state GameState) *Game {
 		StartingTeam: Team(randRnd.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
-		GameState:    resetState(state),
+		GameState:    state,
 	}
 
 	// Pick the next `wordsPerGame` words from the
 	// randomly generated permutation
 	perm := seedRnd.Perm(len(state.WordSet))
 	permIndex := state.PermIndex
-	for _, i := range perm[permIndex:permIndex + wordsPerGame] {
+	for _, i := range perm[permIndex : permIndex+wordsPerGame] {
 		w := state.WordSet[perm[i]]
 		game.Words = append(game.Words, w)
 	}

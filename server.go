@@ -211,23 +211,17 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 			sort.Strings(words)
 		}
 
-	  gh, ok := s.games[request.GameID]
-	  if !ok {
-		  // no game exists, create for the first time
-		  gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
-	  } else if request.CreateNew {
-		  state := gh.g.GameState
-		  if (state.PermIndex + wordsPerGame >= len(state.WordSet)) {
-			  // reset seed and index if game has exhausted all words
-			  state = randomState(state.WordSet)
-		  } else {
-			  // otherwise increment perm index
-			  state.PermIndex = state.PermIndex + wordsPerGame
-		  }
-		  gh = newHandle(newGame(request.GameID, state), s.Store)
-	    s.games[request.GameID] = gh
-	  }
-  }()
+		gh, ok := s.games[request.GameID]
+		if !ok {
+			// no game exists, create for the first time
+			gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
+			s.games[request.GameID] = gh
+		} else if request.CreateNew {
+			nextState := nextGameState(gh.g.GameState)
+			gh = newHandle(newGame(request.GameID, nextState), s.Store)
+			s.games[request.GameID] = gh
+		}
+	}()
 	writeGame(rw, gh)
 }
 
