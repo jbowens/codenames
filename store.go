@@ -58,16 +58,7 @@ func (ps *PebbleStore) Save(g *Game) error {
 
 	log.Printf("[STORE] Saving game %s to key %q.\n", g.ID, k)
 
-	err = ps.DB.Set(k, v, &pebble.WriteOptions{
-		// We're only performing best-effort backups
-		// of the games. The worst case here is that
-		// the machine crashes, and we lose a guess
-		// that was recorded right before the crash.
-		// When the machine comes back up, the old
-		// game state right before the guess will
-		// still exist.
-		Sync: true,
-	})
+	err = ps.DB.Set(k, v, &pebble.WriteOptions{Sync: true})
 	if err != nil {
 		return fmt.Errorf("db.Set: %w", err)
 	}
