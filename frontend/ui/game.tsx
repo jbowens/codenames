@@ -66,11 +66,12 @@ export class Game extends React.Component {
         }
         this.setState({ game: data });
       }),
+      complete: () => {
+        setTimeout(() => {
+          this.refresh();
+        }, 2000);
+      },
     });
-
-    setTimeout(() => {
-      this.refresh();
-    }, 2000);
   }
 
   public toggleRole(e, role) {
