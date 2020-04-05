@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/jbowens/dictionary"
@@ -35,6 +36,9 @@ type Server struct {
 	games        map[string]*GameHandle
 	defaultWords []string
 	mux          *http.ServeMux
+
+	statOpenRequests  int64 // atomic access
+	statTotalRequests int64 //atomic access
 }
 
 type Store interface {
@@ -263,9 +267,11 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 }
 
 type statsResponse struct {
-	GamesTotal          int `json:"games_total"`
-	GamesInProgress     int `json:"games_in_progress"`
-	GamesCreatedOneHour int `json:"games_created_1h"`
+	GamesTotal          int   `json:"games_total"`
+	GamesInProgress     int   `json:"games_in_progress"`
+	GamesCreatedOneHour int   `json:"games_created_1h"`
+	RequestsTotal       int64 `json:"requests_total_process_lifetime"`
+	RequestsInFlight    int64 `json:"requests_in_flight"`
 }
 
 func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
@@ -289,6 +295,8 @@ func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
 		GamesTotal:          len(s.games),
 		GamesInProgress:     inProgress,
 		GamesCreatedOneHour: createdWithinAnHour,
+		RequestsTotal:       atomic.LoadInt64(&s.statTotalRequests),
+		RequestsInFlight:    atomic.LoadInt64(&s.statOpenRequests),
 	})
 }
 
@@ -337,7 +345,7 @@ func (s *Server) Start(games map[string]*Game) error {
 	s.games = make(map[string]*GameHandle)
 	s.defaultWords = d.Words()
 	sort.Strings(s.defaultWords)
-	s.Server.Handler = withPProfHandler(s.mux)
+	s.Server.Handler = withPProfHandler(s)
 
 	if s.Store == nil {
 		s.Store = discardStore{}
@@ -356,6 +364,14 @@ func (s *Server) Start(games map[string]*Game) error {
 	}()
 
 	return s.Server.ListenAndServe()
+}
+
+func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	atomic.AddInt64(&s.statTotalRequests, 1)
+	atomic.AddInt64(&s.statOpenRequests, 1)
+	defer func() { atomic.AddInt64(&s.statOpenRequests, -1) }()
+
+	s.mux.ServeHTTP(rw, req)
 }
 
 func withPProfHandler(next http.Handler) http.Handler {
