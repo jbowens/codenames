@@ -140,6 +140,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 		s.games[body.GameID] = gh
 		s.mu.Unlock()
 		writeGame(rw, gh)
+		return
 	}
 	s.mu.Unlock()
 
