@@ -271,6 +271,7 @@ export class Game extends React.Component {
           handleExpiration={() => {
             this.endTurn();
           }}
+          freezeTimer={!!this.state.game.winning_team}
         />
       </div>
     );

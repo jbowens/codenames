@@ -14,11 +14,13 @@ function getTimeRemaining(endTime: number) {
 interface TimerProps {
   endTime: number;
   handleExpiration: () => void;
+  freezeTimer: boolean;
 }
 
 const Timer: React.FunctionComponent<TimerProps> = ({
   endTime,
   handleExpiration,
+  freezeTimer = false,
 }) => {
   const [timeRemaining, setTimeRemaining] = React.useState(undefined);
 
@@ -27,7 +29,9 @@ const Timer: React.FunctionComponent<TimerProps> = ({
     if (timeRemaining.total < 0) {
       handleExpiration();
     }
-    const timeout = setTimeout(() => setTimeRemaining(timeRemaining), 1000);
+    const timeout = freezeTimer
+      ? null
+      : setTimeout(() => setTimeRemaining(timeRemaining), 1000);
 
     return () => {
       clearTimeout(timeout);
