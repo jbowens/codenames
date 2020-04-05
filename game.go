@@ -94,7 +94,7 @@ func (gs GameState) ID() string {
 			revealed++
 		}
 	}
-	return strconv.FormatInt(31*gs.Seed*int64(gs.PermIndex)+int64(gs.Round)+int64(revealed), 10)
+	return strconv.FormatInt(31*gs.Seed*int64(gs.PermIndex+1)+int64(gs.Round)+int64(revealed), 10)
 }
 
 func (gs GameState) anyRevealed() bool {
