@@ -53,7 +53,12 @@ export class Game extends React.Component {
       return;
     }
 
-    const body = { game_id: this.props.gameID };
+    let state_id = "";
+    if (this.state.game && this.state.game.state_id) {
+      state_id = this.state.game.state_id;
+    }
+
+    const body = { game_id: this.props.gameID, state_id: state_id };
     $.ajax({
       url: '/game-state',
       type: 'POST',
