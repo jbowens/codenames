@@ -66,9 +66,7 @@ func main() {
 	log.Printf("[STARTUP] Listening on addr %s\n", listenAddr)
 	server := &codenames.Server{
 		Server: http.Server{
-			Addr:         listenAddr,
-			ReadTimeout:  5 * time.Second,
-			WriteTimeout: 3 * time.Second,
+			Addr: listenAddr,
 		},
 		Store: ps,
 	}
