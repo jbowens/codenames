@@ -160,9 +160,13 @@ export class Game extends React.Component {
   }
 
   public endTurn() {
-    $.post('/end-turn', JSON.stringify({ game_id: this.state.game.id }), g => {
-      this.setState({ game: g });
-    });
+    $.post(
+      '/end-turn',
+      JSON.stringify({ game_id: this.state.game.id }),
+      g => {
+        this.setState({ game: g });
+      }
+    );
   }
 
   public nextGame(e) {

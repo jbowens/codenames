@@ -38,11 +38,8 @@ export const Lobby = ({ defaultGameID }) => {
   return (
     <div id="lobby">
       <p id="banner">
-        Also, check out the cooperative version at &nbsp;
-        <a href="https://www.codenamesgreen.com" target="_blank">
-          Codenames Green
-        </a>
-        .
+        Also, check out the cooperative version at
+       &nbsp;<a href="https://www.codenamesgreen.com" target="_blank">Codenames Green</a>.
       </p>
       <div id="available-games">
         <form id="new-game">
