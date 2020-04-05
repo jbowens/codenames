@@ -314,5 +314,5 @@
     text-align: right;
     font-size: 0.8em;
 }
-#coffee a { color: #f0f0f0; }
-.color-blind #coffee a { color: #000; font-weight: bold; }
+#coffee a { color: #888; }
+.color-blind #coffee a { font-weight: bold; }
