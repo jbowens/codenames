@@ -126,7 +126,7 @@ func (s *Server) getGameLocked(gameID string) (*GameHandle, bool) {
 	if ok {
 		return gh, ok
 	}
-	gh = newHandle(newGame(gameID, randomState(s.defaultWords), []int32{2, 0}), s.Store)
+	gh = newHandle(newGame(gameID, randomState(s.defaultWords), []int32{}), s.Store)
 	s.games[gameID] = gh
 	return gh, true
 }
@@ -146,7 +146,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	gh, ok := s.getGameLocked(body.GameID)
 	if !ok {
-		gh = newHandle(newGame(body.GameID, randomState(s.defaultWords)), s.Store)
+		gh = newHandle(newGame(body.GameID, randomState(s.defaultWords), []int32{}), s.Store)
 		s.games[body.GameID] = gh
 		s.mu.Unlock()
 		writeGame(rw, gh)
