@@ -246,7 +246,8 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 			sort.Strings(words)
 		}
 
-		gh, ok := s.games[request.GameID]
+		var ok bool
+		gh, ok = s.games[request.GameID]
 		if !ok {
 			// no game exists, create for the first time
 			gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
