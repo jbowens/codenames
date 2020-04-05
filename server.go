@@ -17,6 +17,13 @@ import (
 	"github.com/jbowens/dictionary"
 )
 
+var closed chan struct{}
+
+func init() {
+	closed = make(chan struct{})
+	close(closed)
+}
+
 type Server struct {
 	Server http.Server
 	Store  Store
@@ -38,12 +45,13 @@ type GameHandle struct {
 	store Store
 
 	mu        sync.Mutex
+	updated   chan struct{}
 	marshaled []byte
 	g         *Game
 }
 
 func newHandle(g *Game, s Store) *GameHandle {
-	gh := &GameHandle{store: s, g: g}
+	gh := &GameHandle{store: s, g: g, updated: make(chan struct{})}
 	err := s.Save(g)
 	if err != nil {
 		log.Printf("Unable to write updated game %q to disk: %s\n", gh.g.ID, err)
@@ -56,12 +64,29 @@ func (gh *GameHandle) update(fn func(*Game)) {
 	defer gh.mu.Unlock()
 	fn(gh.g)
 	gh.marshaled = nil
+	ch := gh.updated
+	gh.updated = make(chan struct{})
 
 	// write the updated game to disk
 	err := gh.store.Save(gh.g)
 	if err != nil {
 		log.Printf("Unable to write updated game %q to disk: %s\n", gh.g.ID, err)
 	}
+
+	close(ch)
+}
+
+func (gh *GameHandle) gameStateChanged(stateID *string) <-chan struct{} {
+	if stateID == nil {
+		return closed
+	}
+
+	gh.mu.Lock()
+	defer gh.mu.Unlock()
+	if gh.g.GameState.ID() != *stateID {
+		return closed
+	}
+	return gh.updated
 }
 
 // MarshalJSON implements the encoding/json.Marshaler interface.
@@ -72,7 +97,10 @@ func (gh *GameHandle) MarshalJSON() ([]byte, error) {
 
 	var err error
 	if gh.marshaled == nil {
-		gh.marshaled, err = json.Marshal(gh.g)
+		gh.marshaled, err = json.Marshal(struct {
+			*Game
+			StateID string `json:"state_id"`
+		}{gh.g, gh.g.GameState.ID()})
 	}
 	return gh.marshaled, err
 }
@@ -96,7 +124,8 @@ func (s *Server) getGameLocked(gameID string) (*GameHandle, bool) {
 // POST /game-state
 func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	var body struct {
-		GameID string `json:"game_id"`
+		GameID  string  `json:"game_id"`
+		StateID *string `json:"state_id"`
 	}
 	err := json.NewDecoder(req.Body).Decode(&body)
 	if err != nil {
@@ -106,16 +135,22 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 
 	s.mu.Lock()
 	gh, ok := s.getGameLocked(body.GameID)
-	if ok {
+	if !ok {
+		gh = newHandle(newGame(body.GameID, randomState(s.defaultWords)), s.Store)
+		s.games[body.GameID] = gh
 		s.mu.Unlock()
 		writeGame(rw, gh)
-		return
 	}
-
-	gh = newHandle(newGame(body.GameID, randomState(s.defaultWords)), s.Store)
-	s.games[body.GameID] = gh
 	s.mu.Unlock()
-	writeGame(rw, gh)
+
+	select {
+	case <-req.Context().Done():
+		return
+	case <-time.After(15 * time.Second):
+		writeGame(rw, gh)
+	case <-gh.gameStateChanged(body.StateID):
+		writeGame(rw, gh)
+	}
 }
 
 // POST /guess
