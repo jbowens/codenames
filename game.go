@@ -190,7 +190,7 @@ func newGame(id string, state GameState) *Game {
 	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// distinct randomness across games with same seed
-	randRnd := rand.New(rand.NewSource(state.Seed * int64(state.PermIndex)))
+	randRnd := rand.New(rand.NewSource(state.Seed * int64(state.PermIndex+1)))
 
 	game := &Game{
 		ID:           id,
