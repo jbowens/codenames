@@ -237,6 +237,9 @@
 .dark-mode #remaining {
   color: #eee;
 }
+.dark-mode #timer {
+  color: #eee;
+}
 
 #game-view.full-screen {
   width: 98vw;
@@ -250,6 +253,9 @@
 .full-screen #status-line {
   font-size: 3vh;
   margin: 0.25em 0;
+}
+.full-screen #infoContent {
+  justify-content: flex-end;
 }
 @media (width < 1000px) {
   .full-screen .cell {

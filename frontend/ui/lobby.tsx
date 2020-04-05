@@ -1,5 +1,6 @@
 import * as React from 'react';
 import WordsPicker from '~/ui/words_picker';
+import TimerSettings from '~/ui/timer_settings';
 import OriginalWords from '~/words.json';
 
 // TODO: remove jquery dependency
@@ -11,6 +12,7 @@ export const Lobby = ({ defaultGameID }) => {
   const [newGameName, setNewGameName] = React.useState(defaultGameID);
   const [selectedLanguage, setSelectedLanguage] = React.useState('English');
   const [words, setWords] = React.useState(OriginalWords);
+  const [timer, setTimer] = React.useState(null);
 
   function handleNewGame(e) {
     e.preventDefault();
@@ -24,6 +26,7 @@ export const Lobby = ({ defaultGameID }) => {
         game_id: newGameName,
         word_set: words[selectedLanguage].split(', '),
         create_new: false,
+        timer_settings: timer || [],
       }),
       g => {
         const newURL = (document.location.pathname = '/' + newGameName);
@@ -35,8 +38,11 @@ export const Lobby = ({ defaultGameID }) => {
   return (
     <div id="lobby">
       <p id="banner">
-        Also, check out the cooperative version at
-       &nbsp;<a href="https://www.codenamesgreen.com" target="_blank">Codenames Green</a>.
+        Also, check out the cooperative version at &nbsp;
+        <a href="https://www.codenamesgreen.com" target="_blank">
+          Codenames Green
+        </a>
+        .
       </p>
       <div id="available-games">
         <form id="new-game">
@@ -54,9 +60,12 @@ export const Lobby = ({ defaultGameID }) => {
             }}
             value={newGameName}
           />
+
           <button disabled={!newGameName.length} onClick={handleNewGame}>
             Go
           </button>
+
+          <TimerSettings timer={timer} setTimer={setTimer} />
 
           <div id="new-game-options">
             {Object.keys(OriginalWords).map(_language => (

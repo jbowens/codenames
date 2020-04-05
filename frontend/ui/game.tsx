@@ -180,6 +180,7 @@ export class Game extends React.Component {
         game_id: this.state.game.id,
         word_set: this.state.game.word_set,
         create_new: true,
+        timer_settings: this.state.game.timer_settings,
       }),
       g => {
         this.setState({ game: g, codemaster: false });
@@ -251,7 +252,7 @@ export class Game extends React.Component {
     if (!this.state.settings.fullscreen) {
       shareLink = (
         <div id="share">
-          Send this link to friendssss:
+          Send this link to friends:&nbsp;
           <a className="url" href={window.location.href}>
             {window.location.href}
           </a>
@@ -259,7 +260,7 @@ export class Game extends React.Component {
       );
     }
 
-    const timer = (this.state.settings.timer || true) && (
+    const timer = !!this.state.game.timer_settings?.length && (
       <div id="timer">
         <Timer
           endTime={new Date(this.state.game.end_time).getTime() + 1000}

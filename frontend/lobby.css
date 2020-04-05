@@ -153,3 +153,25 @@ p.intro {
   color: #000;
   font-weight: bold;
 }
+
+#timer-settings {
+  margin: 1.5em 0 1.5em -1em;
+}
+
+#timer-duration {
+  font-family: verdana;
+  font-size: 0.9em;
+  line-height: 1.5em;
+  padding: 0 1em;
+  display: flex;
+  align-items: center;
+}
+#timer-duration span {
+  margin-right: 1.5em;
+}
+#timer-duration label {
+  margin-right: 0.6em;
+}
+#timer-duration input {
+  font-size: 1.3em;
+}
