@@ -3,7 +3,6 @@ package codenames
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
 	"time"
 
@@ -55,8 +54,6 @@ func (ps *PebbleStore) Save(g *Game) error {
 	if err != nil {
 		return fmt.Errorf("trySave: %w", err)
 	}
-
-	log.Printf("[STORE] Saving game %s to key %q.\n", g.ID, k)
 
 	err = ps.DB.Set(k, v, &pebble.WriteOptions{Sync: true})
 	if err != nil {
