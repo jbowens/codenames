@@ -6,6 +6,9 @@ import { Settings, SettingsButton, SettingsPanel } from '~/ui/settings';
 let jquery = require('jquery');
 window.$ = window.jQuery = jquery;
 
+const defaultFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA8SURBVHgB7dHBDQAgCAPA1oVkBWdzPR84kW4AD0LCg36bXJqUcLL2eVY/EEwDFQBeEfPnqUpkLmigAvABK38Grs5TfaMAAAAASUVORK5CYII=';
+const blueTurnFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cxBAQAABATBo5ls6ulEiPt47ASYqJ6VIWUiICD4Ehyi7wKv/xtOewAAAABJRU5ErkJggg==';
+const redTurnFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cwxAQAACMOwgaL5d4EiELGHoxGQGnsVaIUICAi+BAci2gJQFUhklQAAAABJRU5ErkJggg==';
 export class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -38,14 +41,45 @@ export class Game extends React.Component {
     }
   }
 
-  public componentWillMount() {
+  public componentDidMount(prevProps, prevState) {
     window.addEventListener('keydown', this.handleKeyDown.bind(this));
+    this.setDarkMode(prevProps, prevState);
+    this.setTurnIndicatorFavicon(prevProps, prevState);
     this.refresh();
   }
 
   public componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    document.getElementById("favicon").setAttribute("href", defaultFavicon);
     this.setState({ mounted: false });
+  }
+
+  public componentDidUpdate(prevProps, prevState) {
+    this.setDarkMode(prevProps, prevState);
+    this.setTurnIndicatorFavicon(prevProps, prevState);
+  }
+
+  private setDarkMode(prevProps, prevState) {
+    if (!prevState?.settings.darkMode && this.state.settings.darkMode) {
+      document.body.classList.add('dark-mode');
+    }
+    if (prevState?.settings.darkMode && !this.state.settings.darkMode) {
+      document.body.classList.remove('dark-mode');
+    }
+  }
+
+  private setTurnIndicatorFavicon(prevProps, prevState) {
+    if (
+      prevState?.game?.winning_team !== this.state.game?.winning_team ||
+      prevState?.game?.round !== this.state.game?.round ||
+      prevState?.game?.state_id !== this.state.game?.state_id
+    ) {
+      if (this.state.game?.winning_team) {
+        document.getElementById("favicon").setAttribute("href", defaultFavicon);
+      } else {
+        document.getElementById("favicon").setAttribute("href", this.currentTeam() === 'blue' ? blueTurnFavicon : redTurnFavicon);
+      }
+    }
   }
 
   public refresh() {
@@ -190,13 +224,6 @@ export class Game extends React.Component {
           values={this.state.settings}
         />
       );
-    }
-
-    // TODO: This is hacky as hell.
-    if (this.state.settings.darkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
     }
 
     let status, statusClass;
