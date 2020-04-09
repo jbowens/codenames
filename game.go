@@ -187,6 +187,7 @@ func (g *Game) Guess(idx int) error {
 	g.checkWinningCondition()
 	if g.Layout[idx] != g.currentTeam() {
 		g.Round = g.Round + 1
+		g.EndTime = getEndTime(g.TimerSettings)
 	}
 	return nil
 }
