@@ -258,7 +258,10 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 			gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
 			s.games[request.GameID] = gh
 		} else if request.CreateNew {
-			nextState := nextGameState(gh.g.GameState)
+			var nextState GameState
+			gh.update(func(g *Game) {
+				nextState = nextGameState(g.GameState)
+			})
 			gh = newHandle(newGame(request.GameID, nextState), s.Store)
 			s.games[request.GameID] = gh
 		}
