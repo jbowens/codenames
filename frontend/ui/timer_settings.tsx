@@ -21,7 +21,7 @@ const TimerSettings = ({ timer, setTimer }) => {
             id="minutes"
             min={0}
             max={59}
-            value={timer[0]}
+            value={minutes}
             onChange={e => {
               setTimer([parseInt(e?.target?.value), seconds]);
             }}
@@ -33,7 +33,7 @@ const TimerSettings = ({ timer, setTimer }) => {
             id="seconds"
             min={0}
             max={59}
-            value={timer[1]}
+            value={seconds}
             onChange={e => {
               setTimer([minutes, parseInt(e?.target?.value)]);
             }}
