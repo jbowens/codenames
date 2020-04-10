@@ -206,7 +206,8 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 // POST /end-turn
 func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 	var request struct {
-		GameID string `json:"game_id"`
+		GameID       string `json:"game_id"`
+		CurrentRound int    `json:"current_round"`
 	}
 
 	decoder := json.NewDecoder(req.Body)
@@ -218,6 +219,11 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 	gh, ok := s.getGame(request.GameID)
 	if !ok {
 		http.Error(rw, "No such game", 404)
+		return
+	}
+
+	if gh.g.Round > request.CurrentRound {
+		// the turn was has already been ended
 		return
 	}
 
