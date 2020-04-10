@@ -223,7 +223,7 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if gh.g.Round > request.CurrentRound {
-		// the turn was has already been ended
+		// the turn has already been ended
 		return
 	}
 
