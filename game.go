@@ -129,6 +129,7 @@ type Game struct {
 	GameState
 	ID           string    `json:"id"`
 	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 	StartingTeam Team      `json:"starting_team"`
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
 	Words        []string  `json:"words"`
@@ -165,6 +166,7 @@ func (g *Game) NextTurn() error {
 	if g.WinningTeam != nil {
 		return errors.New("game is already over")
 	}
+	g.UpdatedAt = time.Now()
 	g.Round++
 	return nil
 }
@@ -176,6 +178,7 @@ func (g *Game) Guess(idx int) error {
 	if g.Revealed[idx] {
 		return errors.New("cell has already been revealed")
 	}
+	g.UpdatedAt = time.Now()
 	g.Revealed[idx] = true
 
 	if g.Layout[idx] == Black {
@@ -207,6 +210,7 @@ func newGame(id string, state GameState) *Game {
 	game := &Game{
 		ID:           id,
 		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 		StartingTeam: Team(randRnd.Intn(2)) + Red,
 		Words:        make([]string, 0, wordsPerGame),
 		Layout:       make([]Team, 0, wordsPerGame),
