@@ -87,7 +87,7 @@ func (gh *GameHandle) gameStateChanged(stateID *string) <-chan struct{} {
 
 	gh.mu.Lock()
 	defer gh.mu.Unlock()
-	if gh.g.GameState.ID() != *stateID {
+	if gh.g.StateID() != *stateID {
 		return closed
 	}
 	return gh.updated
@@ -104,7 +104,7 @@ func (gh *GameHandle) MarshalJSON() ([]byte, error) {
 		gh.marshaled, err = json.Marshal(struct {
 			*Game
 			StateID string `json:"state_id"`
-		}{gh.g, gh.g.GameState.ID()})
+		}{gh.g, gh.g.StateID()})
 	}
 	return gh.marshaled, err
 }

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 )
 
@@ -86,17 +85,6 @@ type GameState struct {
 	WordSet   []string `json:"word_set"`
 }
 
-// ID returns a hash of the game state.
-func (gs GameState) ID() string {
-	var revealed int
-	for _, r := range gs.Revealed {
-		if r {
-			revealed++
-		}
-	}
-	return strconv.FormatInt(31*gs.Seed*int64(gs.PermIndex+1)+int64(gs.Round)+int64(revealed), 10)
-}
-
 func (gs GameState) anyRevealed() bool {
 	var revealed bool
 	for _, r := range gs.Revealed {
@@ -134,6 +122,10 @@ type Game struct {
 	WinningTeam  *Team     `json:"winning_team,omitempty"`
 	Words        []string  `json:"words"`
 	Layout       []Team    `json:"layout"`
+}
+
+func (g *Game) StateID() string {
+	return fmt.Sprintf("%019d", g.UpdatedAt.UnixNano())
 }
 
 func (g *Game) checkWinningCondition() {
