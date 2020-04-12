@@ -97,6 +97,7 @@ func randomState(words []string) GameState {
 	return GameState{
 		Seed:      rand.Int63(),
 		PermIndex: 0,
+		Round:     0,
 		Revealed:  make([]bool, wordsPerGame),
 		WordSet:   words,
 	}
@@ -110,6 +111,7 @@ func nextGameState(state GameState) GameState {
 		state.PermIndex = 0
 	}
 	state.Revealed = make([]bool, wordsPerGame)
+	state.Round = 0
 	return state
 }
 
