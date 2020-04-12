@@ -273,7 +273,7 @@ export class Game extends React.Component {
           roundStartedAt={this.state.game.round_started_at}
           timerDurationMs={this.state.game.timer_duration_ms}
           handleExpiration={() => {
-              this.endTurn();
+              // this.endTurn();
           }}
           freezeTimer={!!this.state.game.winning_team}
         />
