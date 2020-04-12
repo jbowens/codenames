@@ -26,7 +26,8 @@
 }
 
 #timer {
-  font-size: 3em;
+  font-size: 1.5em;
+  font-family: "Courier New", monospace;
 }
 
 #status-line {

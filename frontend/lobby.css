@@ -174,4 +174,5 @@ p.intro {
 }
 #timer-duration input {
   font-size: 1.3em;
+  max-width: 50px;
 }
