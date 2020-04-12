@@ -4,18 +4,30 @@
   margin: 0 auto;
 }
 
-#share {
-  color: #888;
-  margin-bottom: 2em;
-  font-size: 0.8em;
-  padding-bottom: 2em;
-  border-bottom: 1px #eee solid;
+#infoContent {
   font-family: system, -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
     'Lucida Grande';
+  border-bottom: 1px #eee solid;
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 2em;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1em;
+}
+
+#share {
+  color: #888;
+  font-size: 0.8em;
 }
 
 #share .url {
   color: #888;
+}
+
+#timer {
+  font-size: 1.5em;
+  font-family: "Courier New", monospace;
 }
 
 #status-line {
@@ -226,6 +238,9 @@
 .dark-mode #remaining {
   color: #eee;
 }
+.dark-mode #timer {
+  color: #eee;
+}
 
 #game-view.full-screen {
   width: 98vw;
@@ -239,6 +254,9 @@
 .full-screen #status-line {
   font-size: 3vh;
   margin: 0.25em 0;
+}
+.full-screen #infoContent {
+  justify-content: flex-end;
 }
 @media (width < 1000px) {
   .full-screen .cell {
@@ -310,9 +328,14 @@
 }
 
 #coffee {
-    margin-top: 2em;
-    text-align: right;
-    font-size: 0.8em;
+  margin-top: 2em;
+  text-align: right;
+  font-size: 0.8em;
 }
-#coffee a { color: #888; }
-.color-blind #coffee a { font-weight: bold; }
+#coffee a {
+  color: #f0f0f0;
+}
+.color-blind #coffee a {
+  color: #000;
+  font-weight: bold;
+}

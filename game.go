@@ -117,13 +117,15 @@ func nextGameState(state GameState) GameState {
 
 type Game struct {
 	GameState
-	ID           string    `json:"id"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	StartingTeam Team      `json:"starting_team"`
-	WinningTeam  *Team     `json:"winning_team,omitempty"`
-	Words        []string  `json:"words"`
-	Layout       []Team    `json:"layout"`
+	ID              string    `json:"id"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+	StartingTeam    Team      `json:"starting_team"`
+	WinningTeam     *Team     `json:"winning_team,omitempty"`
+	Words           []string  `json:"words"`
+	Layout          []Team    `json:"layout"`
+	TimerDurationMs int64     `json:"timer_duration_ms,omitempty"`
+	RoundStartedAt  time.Time `json:"round_started_at,omitempty"`
 }
 
 func (g *Game) StateID() string {
@@ -162,6 +164,7 @@ func (g *Game) NextTurn() error {
 	}
 	g.UpdatedAt = time.Now()
 	g.Round++
+	g.RoundStartedAt = time.Now()
 	return nil
 }
 
@@ -184,6 +187,7 @@ func (g *Game) Guess(idx int) error {
 	g.checkWinningCondition()
 	if g.Layout[idx] != g.currentTeam() {
 		g.Round = g.Round + 1
+		g.RoundStartedAt = time.Now()
 	}
 	return nil
 }
@@ -195,20 +199,22 @@ func (g *Game) currentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, state GameState) *Game {
+func newGame(id string, state GameState, timerDurationMs int64) *Game {
 	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// distinct randomness across games with same seed
 	randRnd := rand.New(rand.NewSource(state.Seed * int64(state.PermIndex+1)))
 
 	game := &Game{
-		ID:           id,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-		StartingTeam: Team(randRnd.Intn(2)) + Red,
-		Words:        make([]string, 0, wordsPerGame),
-		Layout:       make([]Team, 0, wordsPerGame),
-		GameState:    state,
+		ID:              id,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+		StartingTeam:    Team(randRnd.Intn(2)) + Red,
+		Words:           make([]string, 0, wordsPerGame),
+		Layout:          make([]Team, 0, wordsPerGame),
+		GameState:       state,
+		TimerDurationMs: timerDurationMs,
+		RoundStartedAt:  time.Now(),
 	}
 
 	// Pick the next `wordsPerGame` words from the

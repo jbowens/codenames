@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Settings, SettingsButton, SettingsPanel } from '~/ui/settings';
+import Timer from '~/ui/timer';
 
 // TODO: remove jquery dependency
 // https://stackoverflow.com/questions/47968529/how-do-i-use-jquery-and-jquery-ui-with-parcel-bundler
@@ -87,7 +88,7 @@ export class Game extends React.Component {
       return;
     }
 
-    let state_id = "";
+    let state_id = '';
     if (this.state.game && this.state.game.state_id) {
       state_id = this.state.game.state_id;
     }
@@ -97,14 +98,14 @@ export class Game extends React.Component {
       url: '/game-state',
       type: 'POST',
       data: JSON.stringify(body),
-      contentType:'application/json; charset=utf-8',
+      contentType: 'application/json; charset=utf-8',
       dataType: 'json',
-      success: (data => {
+      success: data => {
         if (this.state.game && data.created_at != this.state.game.created_at) {
           this.setState({ codemaster: false });
         }
         this.setState({ game: data });
-      }),
+      },
       complete: () => {
         setTimeout(() => {
           this.refresh();
@@ -161,8 +162,11 @@ export class Game extends React.Component {
   public endTurn() {
     $.post(
       '/end-turn',
-      JSON.stringify({ game_id: this.state.game.id }),
-      g => {
+      JSON.stringify({
+        game_id: this.state.game.id,
+        current_round: this.state.game.round,
+      }),
+      (g) => {
         this.setState({ game: g });
       }
     );
@@ -171,10 +175,9 @@ export class Game extends React.Component {
   public nextGame(e) {
     e.preventDefault();
     // Ask for confirmation when current game hasn't finished
-    let allowNextGame = (
+    let allowNextGame =
       this.state.game.winning_team ||
-      confirm("Do you really want to start a new game?")
-    );
+      confirm('Do you really want to start a new game?');
     if (!allowNextGame) {
       return;
     }
@@ -184,6 +187,7 @@ export class Game extends React.Component {
         game_id: this.state.game.id,
         word_set: this.state.game.word_set,
         create_new: true,
+        timer_duration_ms: this.state.game.timer_duration_ms,
       }),
       g => {
         this.setState({ game: g, codemaster: false });
@@ -255,13 +259,26 @@ export class Game extends React.Component {
     if (!this.state.settings.fullscreen) {
       shareLink = (
         <div id="share">
-          Send this link to friends:
+          Send this link to friends:&nbsp;
           <a className="url" href={window.location.href}>
             {window.location.href}
           </a>
         </div>
       );
     }
+
+    const timer = !!this.state.game.timer_duration_ms && (
+      <div id="timer">
+        <Timer
+          roundStartedAt={this.state.game.round_started_at}
+          timerDurationMs={this.state.game.timer_duration_ms}
+          handleExpiration={() => {
+              // this.endTurn();
+          }}
+          freezeTimer={!!this.state.game.winning_team}
+        />
+      </div>
+    );
 
     return (
       <div
@@ -271,7 +288,10 @@ export class Game extends React.Component {
           this.extraClasses()
         }
       >
-        {shareLink}
+        <div id="infoContent">
+          {shareLink}
+          {timer}
+        </div>
         <div id="status-line" className={statusClass}>
           <div id="remaining">
             <span className={this.state.game.starting_team + '-remaining'}>

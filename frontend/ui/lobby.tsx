@@ -1,5 +1,6 @@
 import * as React from 'react';
 import WordsPicker from '~/ui/words_picker';
+import TimerSettings from '~/ui/timer_settings';
 import OriginalWords from '~/words.json';
 
 // TODO: remove jquery dependency
@@ -11,6 +12,7 @@ export const Lobby = ({ defaultGameID }) => {
   const [newGameName, setNewGameName] = React.useState(defaultGameID);
   const [selectedLanguage, setSelectedLanguage] = React.useState('English');
   const [words, setWords] = React.useState(OriginalWords);
+  const [timer, setTimer] = React.useState(null);
 
   function handleNewGame(e) {
     e.preventDefault();
@@ -24,8 +26,12 @@ export const Lobby = ({ defaultGameID }) => {
         game_id: newGameName,
         word_set: words[selectedLanguage].split(', '),
         create_new: false,
+        timer_duration_ms:
+          timer && timer.length
+            ? timer[0] * 60 * 1000 + timer[1] * 1000
+            : 0,
       }),
-      g => {
+      (g) => {
         const newURL = (document.location.pathname = '/' + newGameName);
         window.location = newURL;
       }
@@ -35,8 +41,11 @@ export const Lobby = ({ defaultGameID }) => {
   return (
     <div id="lobby">
       <p id="banner">
-        Also, check out the cooperative version at
-       &nbsp;<a href="https://www.codenamesgreen.com" target="_blank">Codenames Green</a>.
+        Also, check out the cooperative version at &nbsp;
+        <a href="https://www.codenamesgreen.com" target="_blank">
+          Codenames Green
+        </a>
+        .
       </p>
       <div id="available-games">
         <form id="new-game">
@@ -49,21 +58,24 @@ export const Lobby = ({ defaultGameID }) => {
             type="text"
             id="game-name"
             autoFocus
-            onChange={e => {
+            onChange={(e) => {
               setNewGameName(e.target.value);
             }}
             value={newGameName}
           />
+
           <button disabled={!newGameName.length} onClick={handleNewGame}>
             Go
           </button>
 
+          <TimerSettings timer={timer} setTimer={setTimer} />
+
           <div id="new-game-options">
-            {Object.keys(OriginalWords).map(_language => (
+            {Object.keys(OriginalWords).map((_language) => (
               <WordsPicker
                 key={_language}
                 words={words[_language]}
-                onWordChange={e => {
+                onWordChange={(e) => {
                   setWords({ ...words, [_language]: e.target.value });
                 }}
                 language={_language}
