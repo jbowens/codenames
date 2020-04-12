@@ -1,7 +1,15 @@
 import * as React from 'react';
 import ToggleSet from '~/ui/toggle-set';
 
-const TimerSettings = ({ timer, setTimer }) => {
+interface TimerSettingsProps {
+  timer: [number, number];
+  setTimer: (timer: [number, number]) => void;
+}
+
+const TimerSettings: React.FunctionalComponent<TimerSettingsProps> = ({
+  timer,
+  setTimer,
+}) => {
   const [minutes, seconds] = timer || [];
   return (
     <div id="timer-settings">
@@ -22,7 +30,7 @@ const TimerSettings = ({ timer, setTimer }) => {
             min={0}
             max={59}
             value={minutes}
-            onChange={e => {
+            onChange={(e) => {
               setTimer([parseInt(e?.target?.value), seconds]);
             }}
           />
@@ -34,7 +42,7 @@ const TimerSettings = ({ timer, setTimer }) => {
             min={0}
             max={59}
             value={seconds}
-            onChange={e => {
+            onChange={(e) => {
               setTimer([minutes, parseInt(e?.target?.value)]);
             }}
           />

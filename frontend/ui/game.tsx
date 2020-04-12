@@ -187,7 +187,7 @@ export class Game extends React.Component {
         game_id: this.state.game.id,
         word_set: this.state.game.word_set,
         create_new: true,
-        timer_settings: this.state.game.timer_settings,
+        timer_duration_ms: this.state.game.timer_duration_ms,
       }),
       g => {
         this.setState({ game: g, codemaster: false });
@@ -267,12 +267,13 @@ export class Game extends React.Component {
       );
     }
 
-    const timer = !!this.state.game.timer_settings?.length && (
+    const timer = !!this.state.game.timer_duration_ms && (
       <div id="timer">
         <Timer
-          endTime={new Date(this.state.game.end_time).getTime() + 1000}
+          roundStartedAt={this.state.game.round_started_at}
+          timerDurationMs={this.state.game.timer_duration_ms}
           handleExpiration={() => {
-            this.endTurn();
+              this.endTurn();
           }}
           freezeTimer={!!this.state.game.winning_team}
         />

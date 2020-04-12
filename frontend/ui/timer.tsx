@@ -12,17 +12,20 @@ function getTimeRemaining(endTime: number) {
 }
 
 interface TimerProps {
-  endTime: number;
+  roundStartedAt: number;
+  timerDurationMs: number;
   handleExpiration: () => void;
   freezeTimer: boolean;
 }
 
 const Timer: React.FunctionComponent<TimerProps> = ({
-  endTime,
+  roundStartedAt,
+  timerDurationMs,
   handleExpiration,
   freezeTimer = false,
 }) => {
   const [timeRemaining, setTimeRemaining] = React.useState(undefined);
+  const endTime = new Date(roundStartedAt).getTime() + timerDurationMs + 1000;
 
   React.useEffect(() => {
     const timeRemaining = getTimeRemaining(endTime - 1000);
