@@ -13,6 +13,7 @@ export const Lobby = ({ defaultGameID }) => {
   const [selectedLanguage, setSelectedLanguage] = React.useState('English');
   const [words, setWords] = React.useState(OriginalWords);
   const [timer, setTimer] = React.useState(null);
+  const [enforceTimerEnabled, setEnforceTimerEnabled] = React.useState(false);
 
   function handleNewGame(e) {
     e.preventDefault();
@@ -27,9 +28,8 @@ export const Lobby = ({ defaultGameID }) => {
         word_set: words[selectedLanguage].split(', '),
         create_new: false,
         timer_duration_ms:
-          timer && timer.length
-            ? timer[0] * 60 * 1000 + timer[1] * 1000
-            : 0,
+          timer && timer.length ? timer[0] * 60 * 1000 + timer[1] * 1000 : 0,
+        enforce_timer: enforceTimerEnabled,
       }),
       (g) => {
         const newURL = (document.location.pathname = '/' + newGameName);
@@ -68,7 +68,14 @@ export const Lobby = ({ defaultGameID }) => {
             Go
           </button>
 
-          <TimerSettings timer={timer} setTimer={setTimer} />
+          <TimerSettings
+            {...{
+              timer,
+              setTimer,
+              enforceTimerEnabled,
+              setEnforceTimerEnabled,
+            }}
+          />
 
           <div id="new-game-options">
             {Object.keys(OriginalWords).map((_language) => (
