@@ -28,7 +28,7 @@ func init() {
 func randomGames(n int) map[string]*Game {
 	games := make(map[string]*Game)
 	for _, w := range gameIDs[:n] {
-		games[w] = newGame(w, randomState(words))
+		games[w] = newGame(w, randomState(words), 0)
 	}
 	return games
 }

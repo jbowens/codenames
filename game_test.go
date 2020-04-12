@@ -18,7 +18,7 @@ func BenchmarkGameMarshal(b *testing.B) {
 		Round:    0,
 		Revealed: make([]bool, 25),
 		WordSet:  d.Words(),
-	})
+	}, 0)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		_, err = json.Marshal(g)
