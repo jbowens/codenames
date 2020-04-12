@@ -49,13 +49,19 @@ type GameHandle struct {
 	store Store
 
 	mu        sync.Mutex
-	updated   chan struct{}
+	updated   chan struct{} // closed when the game is updated
+	replaced  chan struct{} // closed when the game has been replaced
 	marshaled []byte
 	g         *Game
 }
 
 func newHandle(g *Game, s Store) *GameHandle {
-	gh := &GameHandle{store: s, g: g, updated: make(chan struct{})}
+	gh := &GameHandle{
+		store:    s,
+		g:        g,
+		updated:  make(chan struct{}),
+		replaced: make(chan struct{}),
+	}
 	err := s.Save(g)
 	if err != nil {
 		log.Printf("Unable to write updated game %q to disk: %s\n", gh.g.ID, err)
@@ -80,17 +86,17 @@ func (gh *GameHandle) update(fn func(*Game)) {
 	close(ch)
 }
 
-func (gh *GameHandle) gameStateChanged(stateID *string) <-chan struct{} {
+func (gh *GameHandle) gameStateChanged(stateID *string) (updated <-chan struct{}, replaced <-chan struct{}) {
 	if stateID == nil {
-		return closed
+		return closed, nil
 	}
 
 	gh.mu.Lock()
 	defer gh.mu.Unlock()
 	if gh.g.StateID() != *stateID {
-		return closed
+		return closed, nil
 	}
-	return gh.updated
+	return gh.updated, gh.replaced
 }
 
 // MarshalJSON implements the encoding/json.Marshaler interface.
@@ -148,12 +154,21 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	}
 	s.mu.Unlock()
 
+	updated, replaced := gh.gameStateChanged(body.StateID)
+
 	select {
 	case <-req.Context().Done():
 		return
 	case <-time.After(15 * time.Second):
 		writeGame(rw, gh)
-	case <-gh.gameStateChanged(body.StateID):
+	case <-updated:
+		writeGame(rw, gh)
+	case <-replaced:
+		gh, ok = s.getGame(body.GameID)
+		if !ok {
+			http.Error(rw, "Game removed", 400)
+			return
+		}
 		writeGame(rw, gh)
 	}
 }
@@ -258,9 +273,15 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 			gh = newHandle(newGame(request.GameID, randomState(words)), s.Store)
 			s.games[request.GameID] = gh
 		} else if request.CreateNew {
+			replacedCh := gh.replaced
+
 			nextState := nextGameState(gh.g.GameState)
 			gh = newHandle(newGame(request.GameID, nextState), s.Store)
 			s.games[request.GameID] = gh
+
+			// signal to waiting /game-state goroutines that the
+			// old game was swapped out for a new game.
+			close(replacedCh)
 		}
 	}()
 	writeGame(rw, gh)
