@@ -341,6 +341,9 @@ func (s *Server) Start(games map[string]*Game) error {
 
 	gameIDs = dictionary.Filter(gameIDs, func(s string) bool { return len(s) > 3 })
 	s.gameIDWords = gameIDs.Words()
+	for i, w := range s.gameIDWords {
+		s.gameIDWords[i] = strings.ToLower(w)
+	}
 
 	s.games = make(map[string]*GameHandle)
 	s.defaultWords = d.Words()
