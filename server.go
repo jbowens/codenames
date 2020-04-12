@@ -239,7 +239,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		GameID          string   `json:"game_id"`
 		WordSet         []string `json:"word_set"`
 		CreateNew       bool     `json:"create_new"`
-		TimerDurationMs int64    `json:"timer_duration_ms"`
+		TimerDurationMS int64    `json:"timer_duration_ms"`
 	}
 
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
@@ -273,13 +273,13 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		gh, ok = s.games[request.GameID]
 		if !ok {
 			// no game exists, create for the first time
-			gh = newHandle(newGame(request.GameID, randomState(words), request.TimerDurationMs), s.Store)
+			gh = newHandle(newGame(request.GameID, randomState(words), request.TimerDurationMS), s.Store)
 			s.games[request.GameID] = gh
 		} else if request.CreateNew {
 			replacedCh := gh.replaced
 
 			nextState := nextGameState(gh.g.GameState)
-			gh = newHandle(newGame(request.GameID, nextState, request.TimerDurationMs), s.Store)
+			gh = newHandle(newGame(request.GameID, nextState, request.TimerDurationMS), s.Store)
 			s.games[request.GameID] = gh
 
 			// signal to waiting /game-state goroutines that the

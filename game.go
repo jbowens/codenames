@@ -124,7 +124,7 @@ type Game struct {
 	WinningTeam     *Team     `json:"winning_team,omitempty"`
 	Words           []string  `json:"words"`
 	Layout          []Team    `json:"layout"`
-	TimerDurationMs int64     `json:"timer_duration_ms,omitempty"`
+	TimerDurationMS int64     `json:"timer_duration_ms,omitempty"`
 	RoundStartedAt  time.Time `json:"round_started_at,omitempty"`
 }
 
@@ -204,7 +204,7 @@ func (g *Game) currentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, state GameState, timerDurationMs int64) *Game {
+func newGame(id string, state GameState, timerDurationMS int64) *Game {
 	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// distinct randomness across games with same seed
@@ -218,7 +218,7 @@ func newGame(id string, state GameState, timerDurationMs int64) *Game {
 		Words:           make([]string, 0, wordsPerGame),
 		Layout:          make([]Team, 0, wordsPerGame),
 		GameState:       state,
-		TimerDurationMs: timerDurationMs,
+		TimerDurationMS: timerDurationMS,
 		RoundStartedAt:  time.Now(),
 	}
 
