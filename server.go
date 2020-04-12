@@ -69,10 +69,15 @@ func newHandle(g *Game, s Store) *GameHandle {
 	return gh
 }
 
-func (gh *GameHandle) update(fn func(*Game)) {
+func (gh *GameHandle) update(fn func(*Game) bool) {
 	gh.mu.Lock()
 	defer gh.mu.Unlock()
-	fn(gh.g)
+	ok := fn(gh.g)
+	if !ok {
+		// game wasn't updated
+		return
+	}
+
 	gh.marshaled = nil
 	ch := gh.updated
 	gh.updated = make(chan struct{})
@@ -193,8 +198,9 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	var err error
-	gh.update(func(g *Game) {
+	gh.update(func(g *Game) bool {
 		err = g.Guess(request.Index)
+		return err == nil
 	})
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
@@ -222,19 +228,9 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if gh.g.Round > request.CurrentRound {
-		// the turn has already been ended
-		return
-	}
-
-	var err error
-	gh.update(func(g *Game) {
-		err = g.NextTurn()
+	gh.update(func(g *Game) bool {
+		return g.NextTurn(request.CurrentRound)
 	})
-	if err != nil {
-		http.Error(rw, err.Error(), 400)
-		return
-	}
 	writeGame(rw, gh)
 }
 

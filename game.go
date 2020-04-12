@@ -158,14 +158,19 @@ func (g *Game) checkWinningCondition() {
 	}
 }
 
-func (g *Game) NextTurn() error {
+func (g *Game) NextTurn(currentTurn int) bool {
 	if g.WinningTeam != nil {
-		return errors.New("game is already over")
+		return false
+	}
+	// TODO: remove currentTurn != 0 once we can be sure all
+	// clients are running up-to-date versions of the frontend.
+	if g.Round != currentTurn && currentTurn != 0 {
+		return false
 	}
 	g.UpdatedAt = time.Now()
 	g.Round++
 	g.RoundStartedAt = time.Now()
-	return nil
+	return true
 }
 
 func (g *Game) Guess(idx int) error {
