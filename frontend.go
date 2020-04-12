@@ -12,7 +12,7 @@ const tpl = `
 <html>
     <head>
         <title>Codenames - Play Online</title>
-        <script src="/static/app.js?v=0.01" type="text/javascript"></script>
+        <script src="/static/app.js?v=0.02" type="text/javascript"></script>
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/static/game.css" />
         <link rel="stylesheet" type="text/css" href="/static/lobby.css" />
