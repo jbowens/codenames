@@ -101,16 +101,16 @@ p.intro {
   margin-right: 0.4rem;
 }
 
-.btn-configured-word-set {
-  color: #aaa;
-  font-family: verdana, sans-serif;
-  font-size: 0.8em;
+.btn-custom-word-set {
   cursor: pointer;
   display: flex;
   flex-wrap: nowrap;
+  border-top: 1px #ddd solid;
+  margin-top: 0.5em;
+  padding-top: 0.5em;
 }
 
-.btn-configured-word-set .label {
+.btn-custom-word-set .label {
   flex-grow: 1;
 }
 
@@ -125,14 +125,43 @@ p.intro {
   text-transform: uppercase;
 }
 
-.btn-configured-word-set .symbol {
+#wordsets .instruction {
+    font-size: 0.8em;
+    font-family: verdana;
+    color: #666;
+}
+
+.btn-wordsettoggle {
+    cursor: pointer;
+    border-radius: 0.25em;
+    border: 1px #BBB solid;
+    padding: 0.5em;
+    display: inline-block;
+    margin: 0.25em;
+    font-family: 'verdana', sans-serif;
+    font-size: 0.8em;
+    user-select: none;
+}
+.btn-wordsettoggle:hover {
+    border: 1px #999 solid;
+}
+
+#wordsets .selected {
+    background: #e1f4d0;
+    border: 1px #a0c12a solid;
+}
+
+.btn-custom-word-set .symbol {
   width: 1em;
   display: inline-block;
 }
-.btn-configured-word-set .warning {
-  color: #aa2a16;
+.warning {
+  color: #d13030;
+  margin-top: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9em;
 }
-.btn-configured-word-set:hover .label {
+.btn-custom-word-set:hover .label {
   color: #333;
 }
 
