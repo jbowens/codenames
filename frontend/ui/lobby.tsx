@@ -11,7 +11,7 @@ window.$ = window.jQuery = jquery;
 
 export const Lobby = ({ defaultGameID }) => {
   const [newGameName, setNewGameName] = React.useState(defaultGameID);
-  const [selectedWordSets, setSelectedWordSets] = React.useState(['English']);
+  const [selectedWordSets, setSelectedWordSets] = React.useState(['English (Original)']);
   const [customWordsText, setCustomWordsText] = React.useState('');
   const [words, setWords] = React.useState({ ...OriginalWords, 'Custom': [] });
   const [warning, setWarning] = React.useState(null);
@@ -112,14 +112,16 @@ export const Lobby = ({ defaultGameID }) => {
           <div id="new-game-options">
             <div id="wordsets">
               <p className="instruction">Select <em>at least</em> one wordset and 25 words. So far you've selected <strong>{selectedWordCount}</strong> words.</p>
-              {Object.keys(OriginalWords).map((_label) => (
-                <WordSetToggle
-                  key={_label}
-                  words={words[_label]}
-                  label={_label}
-                  selected={selectedWordSets.includes(_label)}
-                  onToggle={(e) => toggleWordSet(_label)}></WordSetToggle>
-              ))}
+              <div id="default-wordsets">
+                {Object.keys(OriginalWords).map((_label) => (
+                  <WordSetToggle
+                    key={_label}
+                    words={words[_label]}
+                    label={_label}
+                    selected={selectedWordSets.includes(_label)}
+                    onToggle={(e) => toggleWordSet(_label)}></WordSetToggle>
+                ))}
+              </div>
 
               <CustomWords
                 words={customWordsText}
