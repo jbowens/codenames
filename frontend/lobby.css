@@ -41,25 +41,12 @@ p.intro {
 #available-games {
   width: 500px;
   margin: 0 auto;
-  font-family: 'Courier New', monospace;
 }
 
 #available-games ul {
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-#available-games ul li {
-  font-size: 1.8em;
-  margin: 0.5em 0;
-  padding: 0.5em;
-  background: #f0f0f0;
-}
-
-#available-games ul li:hover {
-  background: #a5e5fa;
-  cursor: pointer;
 }
 
 #new-game {
@@ -72,6 +59,7 @@ p.intro {
   padding: 5px 10px;
   font-size: 1.3em;
   border: 1px #ddd solid;
+  border-right: none;
   letter-spacing: 0.1em;
 }
 
@@ -79,11 +67,10 @@ p.intro {
   height: 62px;
   width: 120px;
   padding: 5px 10px;
-  background: #85de6f;
+  background: #e1f4d0;
   border: 1px #ddd solid;
   font-size: 1em;
   vertical-align: top;
-  text-transform: uppercase;
   cursor: pointer;
 }
 
@@ -101,16 +88,16 @@ p.intro {
   margin-right: 0.4rem;
 }
 
-.btn-configured-word-set {
-  color: #aaa;
-  font-family: verdana, sans-serif;
-  font-size: 0.8em;
+.btn-custom-word-set {
   cursor: pointer;
   display: flex;
   flex-wrap: nowrap;
+  border-top: 1px #ddd solid;
+  margin-top: 0.5em;
+  padding-top: 0.5em;
 }
 
-.btn-configured-word-set .label {
+.btn-custom-word-set .label {
   flex-grow: 1;
 }
 
@@ -125,14 +112,46 @@ p.intro {
   text-transform: uppercase;
 }
 
-.btn-configured-word-set .symbol {
+#wordsets {
+  margin-top: 1em;
+}
+#wordsets .instruction {
+    font-size: 0.8em;
+    font-family: verdana;
+    color: #666;
+}
+
+.btn-wordsettoggle {
+    cursor: pointer;
+    border-radius: 0.25em;
+    border: 1px #BBB solid;
+    padding: 0.5em;
+    display: inline-block;
+    margin: 0.25em;
+    font-family: 'verdana', sans-serif;
+    font-size: 0.7em;
+    user-select: none;
+}
+.btn-wordsettoggle:hover {
+    border: 1px #999 solid;
+}
+
+#wordsets .selected {
+    background: #e1f4d0;
+    border: 1px #a0c12a solid;
+}
+
+.btn-custom-word-set .symbol {
   width: 1em;
   display: inline-block;
 }
-.btn-configured-word-set .warning {
-  color: #aa2a16;
+.warning {
+  color: #d13030;
+  margin-top: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9em;
 }
-.btn-configured-word-set:hover .label {
+.btn-custom-word-set:hover .label {
   color: #333;
 }
 
@@ -155,8 +174,15 @@ p.intro {
 }
 
 #timer-settings {
-  margin: 1.5em 0 1.5em -1em;
+  margin: 2em 0 2em 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
+#timer-settings .toggle-set {
+    margin-left: 0;
+    margin-right: 0;
+}
+#timer-settings .label { font-size: 0.9em; }
+#timer-settings .toggle-state { font-size: 0.8em; }
 
 #timer-duration {
   font-family: verdana;

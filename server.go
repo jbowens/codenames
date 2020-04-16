@@ -364,7 +364,7 @@ func (s *Server) Start(games map[string]*Game) error {
 	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/dist"))))
 	s.mux.HandleFunc("/", s.handleIndex)
 
-	gameIDs = dictionary.Filter(gameIDs, func(s string) bool { return len(s) > 3 })
+	gameIDs = dictionary.Filter(gameIDs, func(s string) bool { return len(s) >= 3 })
 	s.gameIDWords = gameIDs.Words()
 	for i, w := range s.gameIDWords {
 		s.gameIDWords[i] = strings.ToLower(w)
