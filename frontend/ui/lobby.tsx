@@ -29,7 +29,6 @@ export const Lobby = ({ defaultGameID }) => {
 
 
   function handleNewGame(e) {
-    console.log("herE");
     e.preventDefault();
     if (!newGameName) {
       return;
@@ -39,7 +38,6 @@ export const Lobby = ({ defaultGameID }) => {
       .map(l => words[l])
       .reduce((a, w) => a.concat(w), []);
 
-    console.log(combinedWordSet.length);
     if (combinedWordSet.length < 25) {
       setWarning('Selected wordsets do not include at least 25 words.');
       return;
