@@ -27,9 +27,11 @@ export class App extends React.Component {
     return (
       <div id="application">
         <div id="topbar">
-          <a href={'http://' + window.location.host}>
-            <h1>Codenames</h1>
-          </a>
+          <h1>
+            <a href={'http://' + window.location.host}>
+              Codenames
+            </a>
+          </h1>
         </div>
         {pane}
       </div>
