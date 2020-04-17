@@ -52,7 +52,7 @@ export const Lobby = ({ defaultGameID }) => {
         create_new: false,
         timer_duration_ms:
           timer && timer.length ? timer[0] * 60 * 1000 + timer[1] * 1000 : 0,
-        enforce_timer: enforceTimerEnabled,
+        enforce_timer: timer && timer.length && enforceTimerEnabled,
       }),
       (g) => {
         const newURL = (document.location.pathname = '/' + newGameName);
@@ -97,7 +97,7 @@ export const Lobby = ({ defaultGameID }) => {
           </button>
 
           { warning !== null ? (<div className="warning">{warning}</div>) : <div></div> }
-          
+
           <TimerSettings
             {...{
               timer,
