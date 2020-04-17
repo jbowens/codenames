@@ -126,6 +126,7 @@ type Game struct {
 	Layout          []Team    `json:"layout"`
 	TimerDurationMS int64     `json:"timer_duration_ms,omitempty"`
 	RoundStartedAt  time.Time `json:"round_started_at,omitempty"`
+	EnforceTimer    bool      `json:"enforce_timer,omitempty"`
 }
 
 func (g *Game) StateID() string {
@@ -204,7 +205,7 @@ func (g *Game) currentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, state GameState, timerDurationMS int64) *Game {
+func newGame(id string, state GameState, timerDurationMS int64, enforceTimer bool) *Game {
 	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// distinct randomness across games with same seed
@@ -220,6 +221,7 @@ func newGame(id string, state GameState, timerDurationMS int64) *Game {
 		GameState:       state,
 		TimerDurationMS: timerDurationMS,
 		RoundStartedAt:  time.Now(),
+		EnforceTimer:    enforceTimer,
 	}
 
 	// Pick the next `wordsPerGame` words from the

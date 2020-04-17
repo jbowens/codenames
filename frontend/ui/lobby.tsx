@@ -16,6 +16,7 @@ export const Lobby = ({ defaultGameID }) => {
   const [words, setWords] = React.useState({ ...OriginalWords, 'Custom': [] });
   const [warning, setWarning] = React.useState(null);
   const [timer, setTimer] = React.useState(null);
+  const [enforceTimerEnabled, setEnforceTimerEnabled] = React.useState(false);
 
   let selectedWordCount = selectedWordSets
     .map(l => words[l].length)
@@ -50,9 +51,8 @@ export const Lobby = ({ defaultGameID }) => {
         word_set: combinedWordSet,
         create_new: false,
         timer_duration_ms:
-          timer && timer.length
-            ? timer[0] * 60 * 1000 + timer[1] * 1000
-            : 0,
+          timer && timer.length ? timer[0] * 60 * 1000 + timer[1] * 1000 : 0,
+        enforce_timer: enforceTimerEnabled,
       }),
       (g) => {
         const newURL = (document.location.pathname = '/' + newGameName);
@@ -97,8 +97,15 @@ export const Lobby = ({ defaultGameID }) => {
           </button>
 
           { warning !== null ? (<div className="warning">{warning}</div>) : <div></div> }
-
-          <TimerSettings timer={timer} setTimer={setTimer} />
+          
+          <TimerSettings
+            {...{
+              timer,
+              setTimer,
+              enforceTimerEnabled,
+              setEnforceTimerEnabled,
+            }}
+          />
 
           <div id="new-game-options">
             <div id="wordsets">

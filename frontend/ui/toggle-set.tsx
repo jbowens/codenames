@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Toggle from '~/ui/toggle';
 
 interface ToggleSetProps {
   toggle: {
@@ -26,12 +27,10 @@ const ToggleSet: React.FunctionalComponent<ToggleSetProps> = ({
           {toggle.desc}
         </div>
       </div>
-      <div
-        onClick={e => handleToggle(e, toggle.setting)}
-        className={values[toggle.setting] ? 'toggle active' : 'toggle inactive'}
-      >
-        <div className="switch"></div>
-      </div>
+      <Toggle
+        state={values[toggle.setting]}
+        handleToggle={(e) => handleToggle(e, toggle.setting)}
+      />
     </div>
   );
 };
