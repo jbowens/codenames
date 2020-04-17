@@ -121,6 +121,10 @@
   height: 18%;
 }
 
+.cell.disabled {
+  cursor: not-allowed !important;
+}
+
 .board {
   display: flex;
   flex-wrap: wrap;

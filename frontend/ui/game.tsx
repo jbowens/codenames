@@ -119,8 +119,11 @@ export class Game extends React.Component {
     this.setState({ codemaster: role == 'codemaster' });
   }
 
-  public guess(e, idx, word) {
+  public guess(e, idx) {
     e.preventDefault();
+    if (this.state.codemaster) {
+      return; // ignore if player is the codemaster
+    }
     if (this.state.game.revealed[idx]) {
       return; // ignore if already revealed
     }
@@ -315,6 +318,7 @@ export class Game extends React.Component {
                 'cell ' +
                 this.state.game.layout[idx] +
                 ' ' +
+                (this.state.codemaster ? 'disabled ' : '') +
                 (this.state.game.revealed[idx] ? 'revealed' : 'hidden-word')
               }
               onClick={e => this.guess(e, idx, w)}
