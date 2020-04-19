@@ -35,10 +35,10 @@
   display: flex;
   justify-content: space-between;
 }
-.red .status-text {
+.red-turn .status-text {
   color: #d13030;
 }
-.blue .status-text {
+.blue-turn .status-text {
   color: #4183cc;
 }
 
@@ -173,13 +173,13 @@
   background: #000000;
   color: #fff;
 }
-.board.win > .cell.red.hidden-word {
+.player .board.win > .cell.red.hidden-word {
   background: rgba(209, 48, 48, 0.4);
 }
-.board.win > .cell.blue.hidden-word {
+.player .board.win > .cell.blue.hidden-word {
   background: rgba(65, 131, 204, 0.4);
 }
-.board.win > .cell.black.hidden-word {
+.player .board.win > .cell.black.hidden-word {
   background: rgba(153, 153, 153, 0.4);
 }
 
@@ -237,6 +237,10 @@
 .dark-mode .codemaster .red.revealed {
   color: #fff;
 }
+.dark-mode .codemaster .black.hidden-word {
+  background: #444;
+}
+
 .dark-mode #end-turn-btn,
 .dark-mode #mode-toggle button {
   background: #444;

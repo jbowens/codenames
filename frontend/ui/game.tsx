@@ -238,7 +238,7 @@ export class Game extends React.Component {
       statusClass = this.state.game.winning_team + ' win';
       status = this.state.game.winning_team + ' wins!';
     } else {
-      statusClass = this.currentTeam();
+      statusClass = this.currentTeam()+'-turn';
       status = this.currentTeam() + "'s turn";
     }
 
