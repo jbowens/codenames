@@ -284,8 +284,9 @@
   bottom: 0;
   right: 0;
   background-color: white;
-  text-align: center;
 }
+
+.settings h2 { text-align: center; }
 
 .close-settings {
   position: fixed;
