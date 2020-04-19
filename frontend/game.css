@@ -173,6 +173,15 @@
   background: #000000;
   color: #fff;
 }
+.board.win > .cell.red.hidden-word {
+  background: rgba(209, 48, 48, 0.4);
+}
+.board.win > .cell.blue.hidden-word {
+  background: rgba(65, 131, 204, 0.4);
+}
+.board.win > .cell.black.hidden-word {
+  background: rgba(153, 153, 153, 0.4);
+}
 
 #remaining span {
   display: inline-block;
