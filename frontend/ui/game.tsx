@@ -310,7 +310,7 @@ export class Game extends React.Component {
           </div>
           {endTurnButton}
         </div>
-        <div className="board">
+        <div className={"board " + statusClass}>
           {this.state.game.words.map((w, idx) => (
             <div
               key={idx}
