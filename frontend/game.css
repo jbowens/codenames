@@ -137,6 +137,10 @@
 }
 .board .neutral.revealed {
   background: #ede2cc;
+  color:#eed;
+}
+.board .neutral.revealed:hover, .board .neutral.revealed:active {
+  color:#000;
 }
 
 .cell .word {
@@ -163,11 +167,15 @@
 
 .board .red.revealed {
   background: #d13030;
-  color: #fff;
+  color: #e33;
 }
 .board .blue.revealed {
   background: #4183cc;
-  color: #fff;
+  color: #48e;
+}
+.board .red.revealed:hover, .board .red.revealed:active,
+.board .blue.revealed:hover, .board .blue.revealed:active {
+  color:#fff;
 }
 .board .black.revealed {
   background: #000000;
