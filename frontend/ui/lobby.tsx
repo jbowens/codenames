@@ -73,6 +73,9 @@ export const Lobby = ({ defaultGameID }) => {
     setSelectedWordSets(wordSets);
   };
 
+  let langs = Object.keys(OriginalWords);
+  langs.sort();
+
   return (
     <div id="lobby">
       <div id="available-games">
@@ -111,7 +114,7 @@ export const Lobby = ({ defaultGameID }) => {
             <div id="wordsets">
               <p className="instruction">You've selected <strong>{selectedWordCount}</strong> words.</p>
               <div id="default-wordsets">
-                {Object.keys(OriginalWords).map((_label) => (
+                {langs.map((_label) => (
                   <WordSetToggle
                     key={_label}
                     words={words[_label]}
