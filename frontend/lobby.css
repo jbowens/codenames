@@ -13,6 +13,10 @@ body {
   text-decoration: none;
 }
 
+.dark-mode #topbar a{
+  color: #888;
+}
+
 h1 {
   text-transform: uppercase;
   letter-spacing: 0.2em;
