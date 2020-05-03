@@ -1,12 +1,11 @@
-language: go
+if: (type = push AND branch IN (master, dev)) OR (type = pull_request AND NOT branch =~ /no-ci/)
 
-branches:
-  only:
-  - master
+language: go
 
 install:
   - go get -d -t -v ./...
   - go get -v golang.org/x/lint/golint
+  - ./scripts/install-frontend.sh
 
 matrix:
   include:
@@ -22,3 +21,6 @@ matrix:
       go: 1.13.x
       os: linux
       script: go test -race ./...
+    - name "frontend"
+      os: linux
+      script: ./scripts/build-frontend.sh
