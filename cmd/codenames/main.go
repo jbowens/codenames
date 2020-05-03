@@ -33,7 +33,12 @@ func main() {
 	}
 	log.Printf("[STARTUP] Opening pebble db from directory: %s\n", dir)
 
-	db, err := pebble.Open(dir, nil)
+	db, err := pebble.Open(dir, &pebble.Options{
+		Merger: &pebble.Merger{
+			Merge: codenames.PebbleMerge,
+			Name:  "codenameskv",
+		},
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "pebble.Open: %s\n", err)
 		os.Exit(1)
