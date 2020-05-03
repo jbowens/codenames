@@ -117,16 +117,20 @@ func nextGameState(state GameState) GameState {
 
 type Game struct {
 	GameState
-	ID              string    `json:"id"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
-	StartingTeam    Team      `json:"starting_team"`
-	WinningTeam     *Team     `json:"winning_team,omitempty"`
-	Words           []string  `json:"words"`
-	Layout          []Team    `json:"layout"`
-	TimerDurationMS int64     `json:"timer_duration_ms,omitempty"`
-	RoundStartedAt  time.Time `json:"round_started_at,omitempty"`
-	EnforceTimer    bool      `json:"enforce_timer,omitempty"`
+	ID             string    `json:"id"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	StartingTeam   Team      `json:"starting_team"`
+	WinningTeam    *Team     `json:"winning_team,omitempty"`
+	Words          []string  `json:"words"`
+	Layout         []Team    `json:"layout"`
+	RoundStartedAt time.Time `json:"round_started_at,omitempty"`
+	GameOptions
+}
+
+type GameOptions struct {
+	TimerDurationMS int64 `json:"timer_duration_ms,omitempty"`
+	EnforceTimer    bool  `json:"enforce_timer,omitempty"`
 }
 
 func (g *Game) StateID() string {
@@ -205,23 +209,22 @@ func (g *Game) currentTeam() Team {
 	return g.StartingTeam.Other()
 }
 
-func newGame(id string, state GameState, timerDurationMS int64, enforceTimer bool) *Game {
+func newGame(id string, state GameState, opts GameOptions) *Game {
 	// consistent randomness across games with the same seed
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// distinct randomness across games with same seed
 	randRnd := rand.New(rand.NewSource(state.Seed * int64(state.PermIndex+1)))
 
 	game := &Game{
-		ID:              id,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
-		StartingTeam:    Team(randRnd.Intn(2)) + Red,
-		Words:           make([]string, 0, wordsPerGame),
-		Layout:          make([]Team, 0, wordsPerGame),
-		GameState:       state,
-		TimerDurationMS: timerDurationMS,
-		RoundStartedAt:  time.Now(),
-		EnforceTimer:    enforceTimer,
+		ID:             id,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+		StartingTeam:   Team(randRnd.Intn(2)) + Red,
+		Words:          make([]string, 0, wordsPerGame),
+		Layout:         make([]Team, 0, wordsPerGame),
+		GameState:      state,
+		RoundStartedAt: time.Now(),
+		GameOptions:    opts,
 	}
 
 	// Pick the next `wordsPerGame` words from the
