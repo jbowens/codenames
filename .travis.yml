@@ -1,0 +1,24 @@
+language: go
+
+branches:
+  only:
+  - master
+
+install:
+  - go get -d -t -v ./...
+  - go get -v golang.org/x/lint/golint
+
+matrix:
+  include:
+    - name: "go1.13.x-linux"
+      go: 1.13.x
+      os: linux
+      script: go test ./...
+    - name: "go1.14.x-linux"
+      go: 1.14.x
+      os: linux
+      script: go test ./...
+    - name: "go1.13.x-linux-race"
+      go: 1.13.x
+      os: linux
+      script: go test -race ./...
