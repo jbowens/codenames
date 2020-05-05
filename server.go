@@ -338,7 +338,7 @@ func (s *Server) cleanupOldGames() {
 		if gh.g.WinningTeam != nil && gh.g.CreatedAt.Add(3*time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			log.Printf("Removed completed game %s\n", id)
-		} else if gh.g.CreatedAt.Add(12 * time.Hour).Before(time.Now()) {
+		} else if gh.g.CreatedAt.Add(72 * time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			log.Printf("Removed expired game %s\n", id)
 		}

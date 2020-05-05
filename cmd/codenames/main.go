@@ -16,7 +16,7 @@ import (
 )
 
 const listenAddr = ":9091"
-const expiryDur = -6 * time.Hour
+const expiryDur = -24 * time.Hour
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
@@ -42,7 +42,7 @@ func main() {
 
 	ps := &codenames.PebbleStore{DB: db}
 
-	// Delete any games created over 6hrs ago.
+	// Delete any games created too long ago.
 	err = ps.DeleteExpired(time.Now().Add(expiryDur))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "PebbleStore.DeletedExpired: %s\n", err)
