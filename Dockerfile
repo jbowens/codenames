@@ -1,37 +1,24 @@
-FROM golang:1.12-stretch as builder
+# Build backend.
+FROM golang:1.14-alpine as backend
+WORKDIR /app
+COPY . .
+RUN apk add gcc musl-dev \
+    && go build ./cmd/codenames/main.go
 
-# Install npm and parcel
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && \
-    npm install -g parcel-bundler
-
-# Copy project into docker instance
+# Build frontend.
+FROM node:12-alpine as frontend
 COPY . /app
+WORKDIR /app/frontend
+RUN npm install -g parcel-bundler \
+    && npm install \
+    && sh build.sh
+
+# Copy build artifacts from previous build stages (to remove files not necessary for
+# deployment).
+FROM alpine:3.11
 WORKDIR /app
-RUN mkdir -p /go/src/codenames
-RUN cp *.go /go/src/codenames/
-
-# Get dependencies
-RUN go get
-
-# Build backend and frontend
-RUN go build /app/cmd/codenames/main.go && \
-    cd /app/frontend/ && \
-    npm install && \
-    sh build.sh
-
-# Copy build artifacts from previous build stage (to remove files not necessary for
-# deployment.)
-FROM debian:buster-slim
-
-WORKDIR /app
-COPY --from=builder /app/main .
-COPY --from=builder /app/assets ./assets
-COPY --from=builder /app/frontend/dist ./frontend/dist
-
-# Expose 9091 port
+COPY --from=backend /app/main .
+COPY --from=frontend /app/frontend/dist ./frontend/dist
+COPY assets assets
 EXPOSE 9091/tcp
-
-# Set entrypoint command
 CMD /app/main
