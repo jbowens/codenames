@@ -182,6 +182,9 @@
 .player .board.win > .cell.black.hidden-word {
   background: rgba(153, 153, 153, 0.4);
 }
+.dark-mode  .codemaster .board.win > .cell.neutral{
+  color: #aaa;
+}
 
 #remaining span {
   display: inline-block;
