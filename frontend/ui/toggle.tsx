@@ -1,11 +1,13 @@
 import * as React from 'react';
 
 interface ToggleProps {
+  name: string;
   state: boolean;
   handleToggle: any;
 }
 
 const Toggle: React.FunctionalComponent<ToggleProps> = ({
+  name,
   state,
   handleToggle,
 }) => {
@@ -14,7 +16,12 @@ const Toggle: React.FunctionalComponent<ToggleProps> = ({
       onClick={handleToggle}
       className={state ? 'toggle active' : 'toggle inactive'}
     >
-      <div className="switch"></div>
+      <div 
+        className="switch"
+        role="button"
+        aria-label={name}
+        aria-pressed={!!state}
+      ></div>
     </div>
   );
 };

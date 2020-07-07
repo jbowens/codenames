@@ -61,6 +61,7 @@ const TimerSettings: React.FunctionalComponent<TimerSettingsProps> = ({
           <div>
             <span>Enforce timer:</span>
             <Toggle
+              name='Enforce Timer'
               state={enforceTimerEnabled}
               handleToggle={() => setEnforceTimerEnabled(!enforceTimerEnabled)}
             />

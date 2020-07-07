@@ -37,7 +37,7 @@ const CustomWords = ({
       </div>
     {expanded && (
       <div>
-        <textarea value={words} onChange={(e) => onWordChange(e.target.value)} />
+        <textarea value={words} aria-label="custom word set" onChange={(e) => onWordChange(e.target.value)} />
       </div>
     )}
   </div>
