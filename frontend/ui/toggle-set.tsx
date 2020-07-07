@@ -28,6 +28,7 @@ const ToggleSet: React.FunctionalComponent<ToggleSetProps> = ({
         </div>
       </div>
       <Toggle
+        name={toggle.name}
         state={values[toggle.setting]}
         handleToggle={(e) => handleToggle(e, toggle.setting)}
       />

@@ -83,6 +83,42 @@ export class Game extends React.Component {
     }
   }
 
+  /* Gets info about current score so screen readers can describe how many words
+   * remain for each team. */
+  private getScoreAriaLabel(startingTeam, otherTeam) {
+    return (
+      "Score: " +
+      this.remaining(startingTeam).toString() + " " + startingTeam + " words remaining, " +
+      this.remaining(otherTeam).toString() + " " + otherTeam + " words remaining"
+    );
+  }
+  
+  // Determines value of aria-disabled attribute to tell screen readers if word can be clicked.
+  private cellDisabled(idx) {
+    if (this.state.codemaster && !this.state.settings.spymasterMayGuess) {
+      return true;
+    } else if (this.state.game.revealed[idx]) {
+      return true;
+    } else if (this.state.game.winning_team) {
+      return true;
+    }
+    return false;
+  }
+
+  // Gets info about word to assist screen readers with describing cell.
+  private getCellAriaLabel(idx) {
+    let ariaLabel = this.state.game.words[idx].toLowerCase();
+    if (this.state.codemaster ||
+        this.state.game.winning_team ||
+        this.state.game.revealed[idx]) {
+      let wordColor = this.state.game.layout[idx];
+      ariaLabel += ', ' + (wordColor === 'black' ? 'assassin' : wordColor);
+    }
+    ariaLabel += ', ' + (this.state.game.revealed[idx] ? 'revealed word' : 'hidden word');
+    ariaLabel += '.';
+    return ariaLabel
+  }
+  
   public refresh() {
     if (!this.state.mounted) {
       return;
@@ -246,7 +282,11 @@ export class Game extends React.Component {
     if (!this.state.game.winning_team && !this.state.codemaster) {
       endTurnButton = (
         <div id="end-turn-cont">
-          <button onClick={e => this.endTurn(e)} id="end-turn-btn">
+          <button 
+            onClick={e => this.endTurn(e)} 
+            id="end-turn-btn"
+            aria-label={"End " + this.currentTeam() + "'s turn"}
+          >
             End {this.currentTeam()}&#39;s turn
           </button>
         </div>
@@ -296,7 +336,11 @@ export class Game extends React.Component {
           {timer}
         </div>
         <div id="status-line" className={statusClass}>
-          <div id="remaining">
+          <div 
+            id="remaining"
+            role="img"
+            aria-label={this.getScoreAriaLabel(this.state.game.starting_team, otherTeam)}
+          >
             <span className={this.state.game.starting_team + '-remaining'}>
               {this.remaining(this.state.game.starting_team)}
             </span>
@@ -323,7 +367,12 @@ export class Game extends React.Component {
               }
               onClick={e => this.guess(e, idx, w)}
             >
-              <span className="word">{w}</span>
+              <span 
+                className="word"
+                role="button"
+                aria-disabled={this.cellDisabled(idx)}
+                aria-label={this.getCellAriaLabel(idx)}
+              >{w}</span>
             </div>
           ))}
         </div>
@@ -332,6 +381,7 @@ export class Game extends React.Component {
           className={
             this.state.codemaster ? 'codemaster-selected' : 'player-selected'
           }
+          role="radiogroup"
         >
           <SettingsButton
             onClick={e => {
@@ -341,12 +391,16 @@ export class Game extends React.Component {
           <button
             onClick={e => this.toggleRole(e, 'player')}
             className="player"
+            role="radio"
+            aria-checked={!this.state.codemaster}
           >
             Player
           </button>
           <button
             onClick={e => this.toggleRole(e, 'codemaster')}
             className="codemaster"
+            role="radio"
+            aria-checked={this.state.codemaster}
           >
             Spymaster
           </button>

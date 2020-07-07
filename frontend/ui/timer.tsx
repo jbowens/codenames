@@ -51,7 +51,16 @@ const Timer: React.FunctionComponent<TimerProps> = ({
   if (timeRemaining.total <= 30) color = '#F70';
   if (timeRemaining.total <= 10) color = '#E22';
   return (
-    <span style={{ color }}>
+    <span 
+      style={{ color }}
+      role="img"
+      aria-label={
+        "Time remaining: " +
+        timeRemaining.minutes.toString() +
+        ":" +
+        timeRemaining.seconds.toString()
+      }
+    >
       {timeRemaining.minutes}:{timeRemaining.seconds}
     </span>
   );

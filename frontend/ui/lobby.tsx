@@ -88,6 +88,7 @@ export const Lobby = ({ defaultGameID }) => {
           <input
             type="text"
             id="game-name"
+            aria-label="game identifier"
             autoFocus
             onChange={(e) => {
               setNewGameName(e.target.value);
