@@ -131,6 +131,11 @@ type Game struct {
 type GameOptions struct {
 	TimerDurationMS int64 `json:"timer_duration_ms,omitempty"`
 	EnforceTimer    bool  `json:"enforce_timer,omitempty"`
+	Hooks           Hooks `json:"-"`
+}
+
+type Hooks struct {
+	Complete func()
 }
 
 func (g *Game) StateID() string {
@@ -154,12 +159,10 @@ func (g *Game) checkWinningCondition() {
 		}
 	}
 	if !redRemaining {
-		winners := Red
-		g.WinningTeam = &winners
+		g.win(Red)
 	}
 	if !blueRemaining {
-		winners := Blue
-		g.WinningTeam = &winners
+		g.win(Blue)
 	}
 }
 
@@ -178,6 +181,11 @@ func (g *Game) NextTurn(currentTurn int) bool {
 	return true
 }
 
+func (g *Game) win(team Team) {
+	g.WinningTeam = &team
+	g.Hooks.Complete()
+}
+
 func (g *Game) Guess(idx int) error {
 	if idx > len(g.Layout) || idx < 0 {
 		return fmt.Errorf("index %d is invalid", idx)
@@ -189,8 +197,7 @@ func (g *Game) Guess(idx int) error {
 	g.Revealed[idx] = true
 
 	if g.Layout[idx] == Black {
-		winners := g.currentTeam().Other()
-		g.WinningTeam = &winners
+		g.win(g.currentTeam().Other())
 		return nil
 	}
 
@@ -214,6 +221,10 @@ func newGame(id string, state GameState, opts GameOptions) *Game {
 	seedRnd := rand.New(rand.NewSource(state.Seed))
 	// distinct randomness across games with same seed
 	randRnd := rand.New(rand.NewSource(state.Seed * int64(state.PermIndex+1)))
+
+	if opts.Hooks.Complete == nil {
+		opts.Hooks.Complete = func() {}
+	}
 
 	game := &Game{
 		ID:             id,

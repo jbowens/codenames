@@ -3,6 +3,7 @@ package codenames
 import (
 	"crypto/subtle"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -31,18 +32,22 @@ type Server struct {
 
 	tpl         *template.Template
 	gameIDWords []string
+	hooks       Hooks
 
 	mu           sync.Mutex
 	games        map[string]*GameHandle
 	defaultWords []string
 	mux          *http.ServeMux
 
-	statOpenRequests  int64 // atomic access
-	statTotalRequests int64 //atomic access
+	statGamesCompleted int64 // atomic access
+	statOpenRequests   int64 // atomic access
+	statTotalRequests  int64 // atomic access
 }
 
 type Store interface {
 	Save(*Game) error
+	CounterAdd(string, int64) error
+	GetCounter(statPrefix string) (int64, error)
 }
 
 type GameHandle struct {
@@ -131,7 +136,7 @@ func (s *Server) getGameLocked(gameID string) (*GameHandle, bool) {
 	if ok {
 		return gh, ok
 	}
-	gh = newHandle(newGame(gameID, randomState(s.defaultWords), GameOptions{}), s.Store)
+	gh = newHandle(newGame(gameID, randomState(s.defaultWords), GameOptions{Hooks: s.hooks}), s.Store)
 	s.games[gameID] = gh
 	return gh, true
 }
@@ -151,7 +156,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	s.mu.Lock()
 	gh, ok := s.getGameLocked(body.GameID)
 	if !ok {
-		gh = newHandle(newGame(body.GameID, randomState(s.defaultWords), GameOptions{}), s.Store)
+		gh = newHandle(newGame(body.GameID, randomState(s.defaultWords), GameOptions{Hooks: s.hooks}), s.Store)
 		s.games[body.GameID] = gh
 		s.mu.Unlock()
 		writeGame(rw, gh)
@@ -273,6 +278,7 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		opts := GameOptions{
 			TimerDurationMS: request.TimerDurationMS,
 			EnforceTimer:    request.EnforceTimer,
+			Hooks:           s.hooks,
 		}
 
 		var ok bool
@@ -297,19 +303,18 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 }
 
 type statsResponse struct {
-	GamesTotal          int   `json:"games_total"`
-	GamesInProgress     int   `json:"games_in_progress"`
-	GamesCreatedOneHour int   `json:"games_created_1h"`
-	RequestsTotal       int64 `json:"requests_total_process_lifetime"`
-	RequestsInFlight    int64 `json:"requests_in_flight"`
+	GamesCompleted         int64 `json:"games_completed"`
+	MemGamesTotal          int   `json:"mem_games_total"`
+	MemGamesInProgress     int   `json:"mem_games_in_progress"`
+	MemGamesCreatedOneHour int   `json:"mem_games_created_1h"`
+	RequestsTotal          int64 `json:"requests_total_process_lifetime"`
+	RequestsInFlight       int64 `json:"requests_in_flight"`
 }
 
 func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
 	hourAgo := time.Now().Add(-time.Hour)
 
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	var inProgress, createdWithinAnHour int
 	for _, gh := range s.games {
 		gh.mu.Lock()
@@ -321,12 +326,23 @@ func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
 		}
 		gh.mu.Unlock()
 	}
+	s.mu.Unlock()
+
+	// Sum up the count of games completed that's on disk and in-memory.
+	diskGamesCompleted, err := s.Store.GetCounter("games/completed/")
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	memGamesCompleted := atomic.LoadInt64(&s.statGamesCompleted)
+
 	writeJSON(rw, statsResponse{
-		GamesTotal:          len(s.games),
-		GamesInProgress:     inProgress,
-		GamesCreatedOneHour: createdWithinAnHour,
-		RequestsTotal:       atomic.LoadInt64(&s.statTotalRequests),
-		RequestsInFlight:    atomic.LoadInt64(&s.statOpenRequests),
+		GamesCompleted:         diskGamesCompleted + memGamesCompleted,
+		MemGamesTotal:          len(s.games),
+		MemGamesInProgress:     inProgress,
+		MemGamesCreatedOneHour: createdWithinAnHour,
+		RequestsTotal:          atomic.LoadInt64(&s.statTotalRequests),
+		RequestsInFlight:       atomic.LoadInt64(&s.statOpenRequests),
 	})
 }
 
@@ -384,8 +400,11 @@ func (s *Server) Start(games map[string]*Game) error {
 		s.Store = discardStore{}
 	}
 
+	s.hooks.Complete = func() { atomic.AddInt64(&s.statGamesCompleted, 1) }
+
 	if games != nil {
 		for _, g := range games {
+			g.GameOptions.Hooks = s.hooks
 			s.games[g.ID] = newHandle(g, s.Store)
 		}
 	}
@@ -393,6 +412,19 @@ func (s *Server) Start(games map[string]*Game) error {
 	go func() {
 		for range time.Tick(10 * time.Minute) {
 			s.cleanupOldGames()
+		}
+	}()
+
+	// Periodically persist some in-memory stats.
+	go func() {
+		const hourFormat = "06010215"
+		for range time.Tick(time.Minute) {
+			hourKey := time.Now().UTC().Format(hourFormat) + "utc"
+			v := atomic.LoadInt64(&s.statGamesCompleted)
+			if v > 0 {
+				atomic.AddInt64(&s.statGamesCompleted, -v)
+				s.Store.CounterAdd(fmt.Sprintf("games/completed/%s", hourKey), v)
+			}
 		}
 	}()
 
