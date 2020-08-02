@@ -33,7 +33,10 @@ func main() {
 	}
 	log.Printf("[STARTUP] Opening pebble db from directory: %s\n", dir)
 
-	db, err := pebble.Open(dir, nil)
+	var opts pebble.Options
+	opts.EventListener = pebble.MakeLoggingEventListener(nil)
+	opts.Experimental.DeleteRangeFlushDelay = 5 * time.Second
+	db, err := pebble.Open(dir, &opts)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "pebble.Open: %s\n", err)
 		os.Exit(1)
