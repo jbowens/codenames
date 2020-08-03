@@ -38,11 +38,12 @@ type Server struct {
 	mux          *http.ServeMux
 
 	statOpenRequests  int64 // atomic access
-	statTotalRequests int64 //atomic access
+	statTotalRequests int64 // atomic access
 }
 
 type Store interface {
 	Save(*Game) error
+	Delete(*Game) error
 }
 
 type GameHandle struct {
@@ -284,6 +285,8 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		} else if request.CreateNew {
 			replacedCh := gh.replaced
 
+			previousGame := gh.g
+
 			nextState := nextGameState(gh.g.GameState)
 			gh = newHandle(newGame(request.GameID, nextState, opts), s.Store)
 			s.games[request.GameID] = gh
@@ -291,6 +294,14 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 			// signal to waiting /game-state goroutines that the
 			// old game was swapped out for a new game.
 			close(replacedCh)
+
+			// Delete the old game from the store. This isn't strictly
+			// necessary, but it helps us reclaim disk space a little more
+			// quickly.
+			err := s.Store.Delete(previousGame)
+			if err != nil {
+				log.Printf("Unable to delete old game %q from disk: %s\n", previousGame.ID, err)
+			}
 		}
 	}()
 	writeGame(rw, gh)

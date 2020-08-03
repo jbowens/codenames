@@ -62,6 +62,16 @@ func (ps *PebbleStore) Save(g *Game) error {
 	return err
 }
 
+// Delete removes a game from persistent storage.
+func (ps *PebbleStore) Delete(g *Game) error {
+	k := mkkey(g.CreatedAt.Unix(), g.ID)
+	err := ps.DB.Delete(k, nil)
+	if err != nil {
+		return fmt.Errorf("db.Delete: %w", err)
+	}
+	return nil
+}
+
 func gameKV(g *Game) (key, value []byte, err error) {
 	value, err = json.Marshal(g)
 	if err != nil {
@@ -80,4 +90,5 @@ func mkkey(unixSecs int64, id string) []byte {
 
 type discardStore struct{}
 
-func (ds discardStore) Save(*Game) error { return nil }
+func (ds discardStore) Save(*Game) error   { return nil }
+func (ds discardStore) Delete(*Game) error { return nil }
