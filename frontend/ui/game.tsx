@@ -1,11 +1,7 @@
 import * as React from 'react';
+import axios from 'axios';
 import { Settings, SettingsButton, SettingsPanel } from '~/ui/settings';
 import Timer from '~/ui/timer';
-
-// TODO: remove jquery dependency
-// https://stackoverflow.com/questions/47968529/how-do-i-use-jquery-and-jquery-ui-with-parcel-bundler
-let jquery = require('jquery');
-window.$ = window.jQuery = jquery;
 
 const defaultFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA8SURBVHgB7dHBDQAgCAPA1oVkBWdzPR84kW4AD0LCg36bXJqUcLL2eVY/EEwDFQBeEfPnqUpkLmigAvABK38Grs5TfaMAAAAASUVORK5CYII=';
 const blueTurnFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cxBAQAABATBo5ls6ulEiPt47ASYqJ6VIWUiICD4Ehyi7wKv/xtOewAAAABJRU5ErkJggg==';
@@ -129,25 +125,28 @@ export class Game extends React.Component {
       state_id = this.state.game.state_id;
     }
 
-    const body = { game_id: this.props.gameID, state_id: state_id };
-    $.ajax({
-      url: '/game-state',
-      type: 'POST',
-      data: JSON.stringify(body),
-      contentType: 'application/json; charset=utf-8',
-      dataType: 'json',
-      success: data => {
-        if (this.state.game && data.created_at != this.state.game.created_at) {
-          this.setState({ codemaster: false });
+    axios.post(
+      '/game-state',
+      {
+        game_id: this.props.gameID,
+        state_id: state_id
+      }
+    ).then(({ data }) => {
+      this.setState(
+        oldState => {
+          const stateToUpdate = { game: data };
+          if (oldState.game && data.created_at != oldState.game.created_at) {
+            stateToUpdate.codemaster = false;
+          }
+          return stateToUpdate;
+        },
+        () => {
+          setTimeout(() => {
+            this.refresh();
+          }, 2000);
         }
-        this.setState({ game: data });
-      },
-      complete: () => {
-        setTimeout(() => {
-          this.refresh();
-        }, 2000);
-      },
-    });
+      );
+    })
   }
 
   public toggleRole(e, role) {
@@ -166,16 +165,16 @@ export class Game extends React.Component {
     if (this.state.game.winning_team) {
       return; // ignore if game is over
     }
-    $.post(
+
+    axios.post(
       '/guess',
-      JSON.stringify({
+      {
         game_id: this.state.game.id,
         index: idx,
-      }),
-      g => {
-        this.setState({ game: g });
       }
-    );
+    ).then(({ data }) => {
+      this.setState({ game: data });
+    });
   }
 
   public currentTeam() {
@@ -199,16 +198,15 @@ export class Game extends React.Component {
   }
 
   public endTurn() {
-    $.post(
+    axios.post(
       '/end-turn',
-      JSON.stringify({
+      {
         game_id: this.state.game.id,
         current_round: this.state.game.round,
-      }),
-      (g) => {
-        this.setState({ game: g });
       }
-    );
+    ).then(({ data }) => {
+      this.setState({ game: data });
+    })
   }
 
   public nextGame(e) {
@@ -220,18 +218,18 @@ export class Game extends React.Component {
     if (!allowNextGame) {
       return;
     }
-    $.post(
+
+    axios.post(
       '/next-game',
-      JSON.stringify({
+      {
         game_id: this.state.game.id,
         word_set: this.state.game.word_set,
         create_new: true,
         timer_duration_ms: this.state.game.timer_duration_ms,
-      }),
-      g => {
-        this.setState({ game: g, codemaster: false });
       }
-    );
+    ).then(({ data }) => {
+      this.setState({ game: data, codemaster: false });
+    })
   }
 
   public toggleSettingsView(e) {

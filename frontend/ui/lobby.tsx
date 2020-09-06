@@ -1,13 +1,9 @@
 import * as React from 'react';
+import axios from 'axios';
 import CustomWords from '~/ui/custom_words';
 import WordSetToggle from '~/ui/wordset_toggle';
 import TimerSettings from '~/ui/timer_settings';
 import OriginalWords from '~/words.json';
-
-// TODO: remove jquery dependency
-// https://stackoverflow.com/questions/47968529/how-do-i-use-jquery-and-jquery-ui-with-parcel-bundler
-var jquery = require('jquery');
-window.$ = window.jQuery = jquery;
 
 export const Lobby = ({ defaultGameID }) => {
   const [newGameName, setNewGameName] = React.useState(defaultGameID);
@@ -44,21 +40,20 @@ export const Lobby = ({ defaultGameID }) => {
       return;
     }
 
-    $.post(
+    axios.post(
       '/next-game',
-      JSON.stringify({
+      {
         game_id: newGameName,
         word_set: combinedWordSet,
         create_new: false,
         timer_duration_ms:
           timer && timer.length ? timer[0] * 60 * 1000 + timer[1] * 1000 : 0,
         enforce_timer: timer && timer.length && enforceTimerEnabled,
-      }),
-      (g) => {
-        const newURL = (document.location.pathname = '/' + newGameName);
-        window.location = newURL;
       }
-    );
+    ).then(() => {
+      const newURL = (document.location.pathname = '/' + newGameName);
+      window.location = newURL;
+    })
   }
 
   let toggleWordSet = (wordSet) => {
