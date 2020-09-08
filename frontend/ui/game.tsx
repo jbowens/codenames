@@ -226,6 +226,7 @@ export class Game extends React.Component {
         word_set: this.state.game.word_set,
         create_new: true,
         timer_duration_ms: this.state.game.timer_duration_ms,
+        enforce_timer: this.state.game.enforce_timer,
       }
     ).then(({ data }) => {
       this.setState({ game: data, codemaster: false });
