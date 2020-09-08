@@ -9,7 +9,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "jquery": "^3.5.0",
+    "axios": "^0.20.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
   },
