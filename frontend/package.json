@@ -26,6 +26,6 @@
     }
   },
   "lint-staged": {
-    "*.{tsx,css}": "prettier --write"
+    "*.{tsx,css,json}": "prettier --write"
   }
 }
