@@ -16,7 +16,7 @@ const Toggle: React.FunctionalComponent<ToggleProps> = ({
       onClick={handleToggle}
       className={state ? 'toggle active' : 'toggle inactive'}
     >
-      <div 
+      <div
         className="switch"
         role="button"
         aria-label={name}
