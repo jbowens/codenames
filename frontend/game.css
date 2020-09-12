@@ -27,7 +27,7 @@
 
 #timer {
   font-size: 1.5em;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
 }
 
 #status-line {
@@ -182,7 +182,7 @@
 .player .board.win > .cell.black.hidden-word {
   background: rgba(153, 153, 153, 0.4);
 }
-.dark-mode  .codemaster .board.win > .cell.neutral{
+.dark-mode .codemaster .board.win > .cell.neutral {
   color: #aaa;
 }
 
@@ -293,7 +293,9 @@
   background-color: white;
 }
 
-.settings h2 { text-align: center; }
+.settings h2 {
+  text-align: center;
+}
 
 .close-settings {
   position: fixed;
@@ -321,7 +323,10 @@
   justify-content: space-between;
 }
 
-.toggle-set .settings-desc { font-size: 0.8em; color: #555; }
+.toggle-set .settings-desc {
+  font-size: 0.8em;
+  color: #555;
+}
 
 .toggle {
   display: flex;
@@ -355,8 +360,12 @@
   text-align: right;
   font-size: 0.8em;
 }
-#coffee a { color: #CCC; }
-.dark-mode #coffee a { color: #555; }
+#coffee a {
+  color: #ccc;
+}
+.dark-mode #coffee a {
+  color: #555;
+}
 .color-blind #coffee a {
   color: #000;
   font-weight: bold;

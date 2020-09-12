@@ -7,15 +7,17 @@ import OriginalWords from '~/words.json';
 
 export const Lobby = ({ defaultGameID }) => {
   const [newGameName, setNewGameName] = React.useState(defaultGameID);
-  const [selectedWordSets, setSelectedWordSets] = React.useState(['English (Original)']);
+  const [selectedWordSets, setSelectedWordSets] = React.useState([
+    'English (Original)',
+  ]);
   const [customWordsText, setCustomWordsText] = React.useState('');
-  const [words, setWords] = React.useState({ ...OriginalWords, 'Custom': [] });
+  const [words, setWords] = React.useState({ ...OriginalWords, Custom: [] });
   const [warning, setWarning] = React.useState(null);
   const [timer, setTimer] = React.useState(null);
   const [enforceTimerEnabled, setEnforceTimerEnabled] = React.useState(false);
 
   let selectedWordCount = selectedWordSets
-    .map(l => words[l].length)
+    .map((l) => words[l].length)
     .reduce((a, cv) => a + cv, 0);
 
   React.useEffect(() => {
@@ -24,7 +26,6 @@ export const Lobby = ({ defaultGameID }) => {
     }
   }, [selectedWordSets, customWordsText]);
 
-
   function handleNewGame(e) {
     e.preventDefault();
     if (!newGameName) {
@@ -32,7 +33,7 @@ export const Lobby = ({ defaultGameID }) => {
     }
 
     let combinedWordSet = selectedWordSets
-      .map(l => words[l])
+      .map((l) => words[l])
       .reduce((a, w) => a.concat(w), []);
 
     if (combinedWordSet.length < 25) {
@@ -40,27 +41,26 @@ export const Lobby = ({ defaultGameID }) => {
       return;
     }
 
-    axios.post(
-      '/next-game',
-      {
+    axios
+      .post('/next-game', {
         game_id: newGameName,
         word_set: combinedWordSet,
         create_new: false,
         timer_duration_ms:
           timer && timer.length ? timer[0] * 60 * 1000 + timer[1] * 1000 : 0,
         enforce_timer: timer && timer.length && enforceTimerEnabled,
-      }
-    ).then(() => {
-      const newURL = (document.location.pathname = '/' + newGameName);
-      window.location = newURL;
-    })
+      })
+      .then(() => {
+        const newURL = (document.location.pathname = '/' + newGameName);
+        window.location = newURL;
+      });
   }
 
   let toggleWordSet = (wordSet) => {
-    let wordSets = [ ...selectedWordSets ];
+    let wordSets = [...selectedWordSets];
     let index = wordSets.indexOf(wordSet);
 
-    if index == -1 {
+    if (index == -1) {
       wordSets.push(wordSet);
     } else {
       wordSets.splice(index, 1);
@@ -95,7 +95,11 @@ export const Lobby = ({ defaultGameID }) => {
             Go
           </button>
 
-          { warning !== null ? (<div className="warning">{warning}</div>) : <div></div> }
+          {warning !== null ? (
+            <div className="warning">{warning}</div>
+          ) : (
+            <div></div>
+          )}
 
           <TimerSettings
             {...{
@@ -108,7 +112,9 @@ export const Lobby = ({ defaultGameID }) => {
 
           <div id="new-game-options">
             <div id="wordsets">
-              <p className="instruction">You've selected <strong>{selectedWordCount}</strong> words.</p>
+              <p className="instruction">
+                You've selected <strong>{selectedWordCount}</strong> words.
+              </p>
               <div id="default-wordsets">
                 {langs.map((_label) => (
                   <WordSetToggle
@@ -116,22 +122,27 @@ export const Lobby = ({ defaultGameID }) => {
                     words={words[_label]}
                     label={_label}
                     selected={selectedWordSets.includes(_label)}
-                    onToggle={(e) => toggleWordSet(_label)}></WordSetToggle>
+                    onToggle={(e) => toggleWordSet(_label)}
+                  ></WordSetToggle>
                 ))}
               </div>
 
               <CustomWords
                 words={customWordsText}
-                onWordChange = {(w) => {
+                onWordChange={(w) => {
                   setCustomWordsText(w);
-                  setWords({...words, 'Custom': (w
-                    .trim()
-                    .split(',')
-                    .map(w => w.trim())
-                    .filter(w => w.length > 0))});
-                }
-                selected = {selectedWordSets.includes("Custom")}
-                onToggle = {(e) => toggleWordSet("Custom")} />
+                  setWords({
+                    ...words,
+                    Custom: w
+                      .trim()
+                      .split(',')
+                      .map((w) => w.trim())
+                      .filter((w) => w.length > 0),
+                  });
+                }}
+                selected={selectedWordSets.includes('Custom')}
+                onToggle={(e) => toggleWordSet('Custom')}
+              />
             </div>
           </div>
         </form>

@@ -1,7 +1,10 @@
 {
   "devDependencies": {
     "cssnano": "^4.1.10",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.3.0",
     "parcel-bundler": "^1.12.3",
+    "prettier": "^2.1.1",
     "typescript": "^3.8.3"
   },
   "name": "frontend",
@@ -16,5 +19,13 @@
   "scripts": {
     "start": "parcel watch app.tsx game.css lobby.css",
     "build": "./build.sh"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{tsx,css,json}": "prettier --write"
   }
 }

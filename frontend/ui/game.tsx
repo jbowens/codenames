@@ -3,9 +3,12 @@ import axios from 'axios';
 import { Settings, SettingsButton, SettingsPanel } from '~/ui/settings';
 import Timer from '~/ui/timer';
 
-const defaultFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA8SURBVHgB7dHBDQAgCAPA1oVkBWdzPR84kW4AD0LCg36bXJqUcLL2eVY/EEwDFQBeEfPnqUpkLmigAvABK38Grs5TfaMAAAAASUVORK5CYII=';
-const blueTurnFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cxBAQAABATBo5ls6ulEiPt47ASYqJ6VIWUiICD4Ehyi7wKv/xtOewAAAABJRU5ErkJggg==';
-const redTurnFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cwxAQAACMOwgaL5d4EiELGHoxGQGnsVaIUICAi+BAci2gJQFUhklQAAAABJRU5ErkJggg==';
+const defaultFavicon =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA8SURBVHgB7dHBDQAgCAPA1oVkBWdzPR84kW4AD0LCg36bXJqUcLL2eVY/EEwDFQBeEfPnqUpkLmigAvABK38Grs5TfaMAAAAASUVORK5CYII=';
+const blueTurnFavicon =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cxBAQAABATBo5ls6ulEiPt47ASYqJ6VIWUiICD4Ehyi7wKv/xtOewAAAABJRU5ErkJggg==';
+const redTurnFavicon =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAmSURBVHgB7cwxAQAACMOwgaL5d4EiELGHoxGQGnsVaIUICAi+BAci2gJQFUhklQAAAABJRU5ErkJggg==';
 export class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -47,7 +50,7 @@ export class Game extends React.Component {
 
   public componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyDown.bind(this));
-    document.getElementById("favicon").setAttribute("href", defaultFavicon);
+    document.getElementById('favicon').setAttribute('href', defaultFavicon);
     this.setState({ mounted: false });
   }
 
@@ -72,9 +75,14 @@ export class Game extends React.Component {
       prevState?.game?.state_id !== this.state.game?.state_id
     ) {
       if (this.state.game?.winning_team) {
-        document.getElementById("favicon").setAttribute("href", defaultFavicon);
+        document.getElementById('favicon').setAttribute('href', defaultFavicon);
       } else {
-        document.getElementById("favicon").setAttribute("href", this.currentTeam() === 'blue' ? blueTurnFavicon : redTurnFavicon);
+        document
+          .getElementById('favicon')
+          .setAttribute(
+            'href',
+            this.currentTeam() === 'blue' ? blueTurnFavicon : redTurnFavicon
+          );
       }
     }
   }
@@ -83,12 +91,18 @@ export class Game extends React.Component {
    * remain for each team. */
   private getScoreAriaLabel(startingTeam, otherTeam) {
     return (
-      "Score: " +
-      this.remaining(startingTeam).toString() + " " + startingTeam + " words remaining, " +
-      this.remaining(otherTeam).toString() + " " + otherTeam + " words remaining"
+      'Score: ' +
+      this.remaining(startingTeam).toString() +
+      ' ' +
+      startingTeam +
+      ' words remaining, ' +
+      this.remaining(otherTeam).toString() +
+      ' ' +
+      otherTeam +
+      ' words remaining'
     );
   }
-  
+
   // Determines value of aria-disabled attribute to tell screen readers if word can be clicked.
   private cellDisabled(idx) {
     if (this.state.codemaster && !this.state.settings.spymasterMayGuess) {
@@ -104,17 +118,20 @@ export class Game extends React.Component {
   // Gets info about word to assist screen readers with describing cell.
   private getCellAriaLabel(idx) {
     let ariaLabel = this.state.game.words[idx].toLowerCase();
-    if (this.state.codemaster ||
-        this.state.game.winning_team ||
-        this.state.game.revealed[idx]) {
+    if (
+      this.state.codemaster ||
+      this.state.game.winning_team ||
+      this.state.game.revealed[idx]
+    ) {
       let wordColor = this.state.game.layout[idx];
       ariaLabel += ', ' + (wordColor === 'black' ? 'assassin' : wordColor);
     }
-    ariaLabel += ', ' + (this.state.game.revealed[idx] ? 'revealed word' : 'hidden word');
+    ariaLabel +=
+      ', ' + (this.state.game.revealed[idx] ? 'revealed word' : 'hidden word');
     ariaLabel += '.';
-    return ariaLabel
+    return ariaLabel;
   }
-  
+
   public refresh() {
     if (!this.state.mounted) {
       return;
@@ -125,28 +142,27 @@ export class Game extends React.Component {
       state_id = this.state.game.state_id;
     }
 
-    axios.post(
-      '/game-state',
-      {
+    axios
+      .post('/game-state', {
         game_id: this.props.gameID,
-        state_id: state_id
-      }
-    ).then(({ data }) => {
-      this.setState(
-        oldState => {
-          const stateToUpdate = { game: data };
-          if (oldState.game && data.created_at != oldState.game.created_at) {
-            stateToUpdate.codemaster = false;
+        state_id: state_id,
+      })
+      .then(({ data }) => {
+        this.setState(
+          (oldState) => {
+            const stateToUpdate = { game: data };
+            if (oldState.game && data.created_at != oldState.game.created_at) {
+              stateToUpdate.codemaster = false;
+            }
+            return stateToUpdate;
+          },
+          () => {
+            setTimeout(() => {
+              this.refresh();
+            }, 2000);
           }
-          return stateToUpdate;
-        },
-        () => {
-          setTimeout(() => {
-            this.refresh();
-          }, 2000);
-        }
-      );
-    })
+        );
+      });
   }
 
   public toggleRole(e, role) {
@@ -166,15 +182,14 @@ export class Game extends React.Component {
       return; // ignore if game is over
     }
 
-    axios.post(
-      '/guess',
-      {
+    axios
+      .post('/guess', {
         game_id: this.state.game.id,
         index: idx,
-      }
-    ).then(({ data }) => {
-      this.setState({ game: data });
-    });
+      })
+      .then(({ data }) => {
+        this.setState({ game: data });
+      });
   }
 
   public currentTeam() {
@@ -198,15 +213,14 @@ export class Game extends React.Component {
   }
 
   public endTurn() {
-    axios.post(
-      '/end-turn',
-      {
+    axios
+      .post('/end-turn', {
         game_id: this.state.game.id,
         current_round: this.state.game.round,
-      }
-    ).then(({ data }) => {
-      this.setState({ game: data });
-    })
+      })
+      .then(({ data }) => {
+        this.setState({ game: data });
+      });
   }
 
   public nextGame(e) {
@@ -219,18 +233,17 @@ export class Game extends React.Component {
       return;
     }
 
-    axios.post(
-      '/next-game',
-      {
+    axios
+      .post('/next-game', {
         game_id: this.state.game.id,
         word_set: this.state.game.word_set,
         create_new: true,
         timer_duration_ms: this.state.game.timer_duration_ms,
         enforce_timer: this.state.game.enforce_timer,
-      }
-    ).then(({ data }) => {
-      this.setState({ game: data, codemaster: false });
-    })
+      })
+      .then(({ data }) => {
+        this.setState({ game: data, codemaster: false });
+      });
   }
 
   public toggleSettingsView(e) {
@@ -261,7 +274,7 @@ export class Game extends React.Component {
     if (this.state.mode == 'settings') {
       return (
         <SettingsPanel
-          toggleView={e => this.toggleSettingsView(e)}
+          toggleView={(e) => this.toggleSettingsView(e)}
           toggle={(e, setting) => this.toggleSetting(e, setting)}
           values={this.state.settings}
         />
@@ -273,7 +286,7 @@ export class Game extends React.Component {
       statusClass = this.state.game.winning_team + ' win';
       status = this.state.game.winning_team + ' wins!';
     } else {
-      statusClass = this.currentTeam()+'-turn';
+      statusClass = this.currentTeam() + '-turn';
       status = this.currentTeam() + "'s turn";
     }
 
@@ -281,10 +294,10 @@ export class Game extends React.Component {
     if (!this.state.game.winning_team && !this.state.codemaster) {
       endTurnButton = (
         <div id="end-turn-cont">
-          <button 
-            onClick={e => this.endTurn(e)} 
+          <button
+            onClick={(e) => this.endTurn(e)}
             id="end-turn-btn"
-            aria-label={"End " + this.currentTeam() + "'s turn"}
+            aria-label={'End ' + this.currentTeam() + "'s turn"}
           >
             End {this.currentTeam()}&#39;s turn
           </button>
@@ -315,7 +328,7 @@ export class Game extends React.Component {
           roundStartedAt={this.state.game.round_started_at}
           timerDurationMs={this.state.game.timer_duration_ms}
           handleExpiration={() => {
-              this.state.game.enforce_timer && this.endTurn();
+            this.state.game.enforce_timer && this.endTurn();
           }}
           freezeTimer={!!this.state.game.winning_team}
         />
@@ -335,10 +348,13 @@ export class Game extends React.Component {
           {timer}
         </div>
         <div id="status-line" className={statusClass}>
-          <div 
+          <div
             id="remaining"
             role="img"
-            aria-label={this.getScoreAriaLabel(this.state.game.starting_team, otherTeam)}
+            aria-label={this.getScoreAriaLabel(
+              this.state.game.starting_team,
+              otherTeam
+            )}
           >
             <span className={this.state.game.starting_team + '-remaining'}>
               {this.remaining(this.state.game.starting_team)}
@@ -353,7 +369,7 @@ export class Game extends React.Component {
           </div>
           {endTurnButton}
         </div>
-        <div className={"board " + statusClass}>
+        <div className={'board ' + statusClass}>
           {this.state.game.words.map((w, idx) => (
             <div
               key={idx}
@@ -361,17 +377,21 @@ export class Game extends React.Component {
                 'cell ' +
                 this.state.game.layout[idx] +
                 ' ' +
-                (this.state.codemaster && !this.state.settings.spymasterMayGuess ? 'disabled ' : '') +
+                (this.state.codemaster && !this.state.settings.spymasterMayGuess
+                  ? 'disabled '
+                  : '') +
                 (this.state.game.revealed[idx] ? 'revealed' : 'hidden-word')
               }
-              onClick={e => this.guess(e, idx, w)}
+              onClick={(e) => this.guess(e, idx, w)}
             >
-              <span 
+              <span
                 className="word"
                 role="button"
                 aria-disabled={this.cellDisabled(idx)}
                 aria-label={this.getCellAriaLabel(idx)}
-              >{w}</span>
+              >
+                {w}
+              </span>
             </div>
           ))}
         </div>
@@ -383,12 +403,12 @@ export class Game extends React.Component {
           role="radiogroup"
         >
           <SettingsButton
-            onClick={e => {
+            onClick={(e) => {
               this.toggleSettingsView(e);
             }}
           />
           <button
-            onClick={e => this.toggleRole(e, 'player')}
+            onClick={(e) => this.toggleRole(e, 'player')}
             className="player"
             role="radio"
             aria-checked={!this.state.codemaster}
@@ -396,18 +416,22 @@ export class Game extends React.Component {
             Player
           </button>
           <button
-            onClick={e => this.toggleRole(e, 'codemaster')}
+            onClick={(e) => this.toggleRole(e, 'codemaster')}
             className="codemaster"
             role="radio"
             aria-checked={this.state.codemaster}
           >
             Spymaster
           </button>
-          <button onClick={e => this.nextGame(e)} id="next-game-btn">
+          <button onClick={(e) => this.nextGame(e)} id="next-game-btn">
             Next game
           </button>
         </form>
-        <div id="coffee"><a href="https://www.buymeacoffee.com/jbowens" target="_blank">Buy the developer a coffee.</a></div>
+        <div id="coffee">
+          <a href="https://www.buymeacoffee.com/jbowens" target="_blank">
+            Buy the developer a coffee.
+          </a>
+        </div>
       </div>
     );
   }

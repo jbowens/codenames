@@ -23,9 +23,7 @@ const ToggleSet: React.FunctionalComponent<ToggleSetProps> = ({
         <span className={'toggle-state'}>
           {values[toggle.setting] ? 'ON' : 'OFF'}
         </span>
-        <div className="settings-desc">
-          {toggle.desc}
-        </div>
+        <div className="settings-desc">{toggle.desc}</div>
       </div>
       <Toggle
         name={toggle.name}
