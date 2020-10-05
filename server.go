@@ -44,6 +44,7 @@ type Server struct {
 type Store interface {
 	Save(*Game) error
 	Delete(*Game) error
+	Checkpoint(io.Writer) error
 }
 
 type GameHandle struct {
@@ -341,6 +342,13 @@ func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
 	})
 }
 
+func (s *Server) handleCheckpoint(rw http.ResponseWriter, req *http.Request) {
+	err := s.Store.Checkpoint(rw)
+	if err != nil {
+		log.Printf("[ERROR] Write checkpoint %s\n", err)
+	}
+}
+
 func (s *Server) cleanupOldGames() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -379,6 +387,17 @@ func (s *Server) Start(games map[string]*Game) error {
 	s.mux.HandleFunc("/game-state", s.handleGameState)
 	s.mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("frontend/dist"))))
 	s.mux.HandleFunc("/", s.handleIndex)
+
+	bootstrapPW := os.Getenv("BOOTSTRAPPW")
+	// If no bootstrap PW is set, don't expose the checkpoint endpoint so we
+	// don't default to open.
+	if bootstrapPW != "" {
+		log.Printf("/checkpoint endpoint enabled\n")
+		s.mux.Handle("/checkpoint", basicAuth(
+			http.HandlerFunc(s.handleCheckpoint),
+			os.Getenv("BOOTSTRAPPW"),
+			"admin"))
+	}
 
 	gameIDs = dictionary.Filter(gameIDs, func(s string) bool { return len(s) >= 3 })
 	s.gameIDWords = gameIDs.Words()

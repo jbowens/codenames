@@ -1,9 +1,16 @@
 package codenames
 
 import (
+	"compress/gzip"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"math"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/cockroachdb/pebble"
@@ -72,6 +79,64 @@ func (ps *PebbleStore) Delete(g *Game) error {
 	return nil
 }
 
+type CheckpointFile struct {
+	Name string
+	Data []byte
+}
+
+// Checkpoint returns a serialized represenation of the entire store.
+func (ps *PebbleStore) Checkpoint(w io.Writer) error {
+	// Compact the entire key space. The database tends to be small and there
+	// tends to be a significant number of obsolete keys, so this shouldn't be
+	// too expensive but will reduce the number of bytes we need to send over
+	// the network.
+	err := ps.DB.Compact([]byte{}, []byte{0xFF, 0xFF, 0xFF, 0xFF})
+	if err != nil {
+		return err
+	}
+
+	// Create a Pebble checkpoint in a temporary directory.
+	name, err := ioutil.TempDir("", "checkpoint")
+	if err != nil {
+		return err
+	}
+	if err := os.RemoveAll(name); err != nil {
+		return err
+	}
+	defer os.RemoveAll(name)
+
+	err = ps.DB.Checkpoint(name)
+	if err != nil {
+		return err
+	}
+
+	// Write all the files in the checkpoint out over the network.
+	gzipWriter := gzip.NewWriter(w)
+	enc := gob.NewEncoder(gzipWriter)
+	err = filepath.Walk(name, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return err
+		}
+		b, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		relPath, err := filepath.Rel(name, path)
+		if err != nil {
+			return err
+		}
+		log.Printf("Checkpoint sending file %s (%d bytes)\n", relPath, len(b))
+		return enc.Encode(CheckpointFile{
+			Name: relPath,
+			Data: b,
+		})
+	})
+	if err != nil {
+		return err
+	}
+	return gzipWriter.Close()
+}
+
 func gameKV(g *Game) (key, value []byte, err error) {
 	value, err = json.Marshal(g)
 	if err != nil {
@@ -90,5 +155,6 @@ func mkkey(unixSecs int64, id string) []byte {
 
 type discardStore struct{}
 
-func (ds discardStore) Save(*Game) error   { return nil }
-func (ds discardStore) Delete(*Game) error { return nil }
+func (ds discardStore) Save(*Game) error           { return nil }
+func (ds discardStore) Delete(*Game) error         { return nil }
+func (ds discardStore) Checkpoint(io.Writer) error { return nil }
