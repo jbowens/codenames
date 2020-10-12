@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/gob"
+	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime/trace"
@@ -13,13 +19,23 @@ import (
 
 	"github.com/cockroachdb/pebble"
 	"github.com/jbowens/codenames"
+	"github.com/pkg/errors"
 )
 
-const listenAddr = ":9091"
+const defaultListenAddr = ":9091"
 const expiryDur = -24 * time.Hour
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+
+	var bootstrapURL string
+	var listenAddr string
+	flag.StringVar(&listenAddr, "listen-addr", defaultListenAddr,
+		"address for server to listen on")
+	flag.StringVar(&bootstrapURL, "bootstrap-url", "",
+		"URL of an existing codenames server to bootstrap the DB from")
+
+	flag.Parse()
 
 	// Open a Pebble DB to persist games to disk.
 	dir := os.Getenv("PEBBLE_DIR")
@@ -32,6 +48,16 @@ func main() {
 		os.Exit(1)
 	}
 	log.Printf("[STARTUP] Opening pebble db from directory: %s\n", dir)
+
+	if len(bootstrapURL) > 0 {
+		err := bootstrap(bootstrapURL, dir)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Bootstrapping from %q: %s\n", bootstrapURL, err)
+			os.Exit(1)
+		}
+		fmt.Printf("Bootstrapped from %q.\n", bootstrapURL)
+		os.Exit(0)
+	}
 
 	var opts pebble.Options
 	opts.EventListener = pebble.MakeLoggingEventListener(nil)
@@ -76,6 +102,60 @@ func main() {
 	if err := server.Start(games); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 	}
+}
+
+func bootstrap(bootstrapURL, dir string) error {
+	ls, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	if len(ls) > 0 {
+		return fmt.Errorf("directory %q is not empty: aborting\n", dir)
+	}
+	u, err := url.Parse(bootstrapURL)
+	if err != nil {
+		return err
+	}
+	u.Path = "/checkpoint"
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth("admin", os.Getenv("BOOTSTRAPPW"))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("checkpoint returned %s status code\n", resp.Status)
+	}
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	r := bytes.NewReader(b)
+	gzr, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+	dec := gob.NewDecoder(gzr)
+	for {
+		var cf codenames.CheckpointFile
+		err := dec.Decode(&cf)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(filepath.Join(dir, cf.Name), cf.Data, os.ModePerm)
+		if err != nil {
+			return errors.Wrapf(err, "writing %s", filepath.Base(cf.Name))
+		}
+		log.Printf("Downloaded %s (%d bytes)\n", cf.Name, len(cf.Data))
+	}
+	return nil
 }
 
 func deleteExpiredPeriodically(ps *codenames.PebbleStore) {
