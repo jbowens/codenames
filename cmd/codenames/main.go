@@ -62,6 +62,7 @@ func main() {
 	var opts pebble.Options
 	opts.EventListener = pebble.MakeLoggingEventListener(nil)
 	opts.Experimental.DeleteRangeFlushDelay = 5 * time.Second
+	opts.Experimental.L0SublevelCompactions = true
 	db, err := pebble.Open(dir, &opts)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "pebble.Open: %s\n", err)
