@@ -233,6 +233,10 @@ func (s *Server) handleNextGame(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, "Need at least 25 words", 400)
 		return
 	}
+	if len(wordSet) > 10000 {
+		http.Error(rw, "Too many words in the set.", 400)
+		return
+	}
 
 	var gh *GameHandle
 	func() {
