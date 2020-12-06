@@ -122,20 +122,17 @@ func (gh *GameHandle) MarshalJSON() ([]byte, error) {
 	return gh.marshaled, err
 }
 
-func (s *Server) getGame(gameID string) (*GameHandle, bool) {
+func (s *Server) getGame(gameID string) *GameHandle {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.getGameLocked(gameID)
-}
 
-func (s *Server) getGameLocked(gameID string) (*GameHandle, bool) {
 	gh, ok := s.games[gameID]
 	if ok {
-		return gh, ok
+		return gh
 	}
 	gh = newHandle(newGame(gameID, randomState(s.defaultWords), GameOptions{}), s.Store)
 	s.games[gameID] = gh
-	return gh, true
+	return gh
 }
 
 // POST /game-state
@@ -150,16 +147,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s.mu.Lock()
-	gh, ok := s.getGameLocked(body.GameID)
-	if !ok {
-		gh = newHandle(newGame(body.GameID, randomState(s.defaultWords), GameOptions{}), s.Store)
-		s.games[body.GameID] = gh
-		s.mu.Unlock()
-		writeGame(rw, gh)
-		return
-	}
-	s.mu.Unlock()
+	gh := s.getGame(body.GameID)
 
 	updated, replaced := gh.gameStateChanged(body.StateID)
 
@@ -171,11 +159,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 	case <-updated:
 		writeGame(rw, gh)
 	case <-replaced:
-		gh, ok = s.getGame(body.GameID)
-		if !ok {
-			http.Error(rw, "Game removed", 400)
-			return
-		}
+		gh = s.getGame(body.GameID)
 		writeGame(rw, gh)
 	}
 }
@@ -193,11 +177,7 @@ func (s *Server) handleGuess(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	gh, ok := s.getGame(request.GameID)
-	if !ok {
-		http.Error(rw, "No such game", 404)
-		return
-	}
+	gh := s.getGame(request.GameID)
 
 	var err error
 	gh.update(func(g *Game) bool {
@@ -224,11 +204,7 @@ func (s *Server) handleEndTurn(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	gh, ok := s.getGame(request.GameID)
-	if !ok {
-		http.Error(rw, "No such game", 404)
-		return
-	}
+	gh := s.getGame(request.GameID)
 
 	gh.update(func(g *Game) bool {
 		return g.NextTurn(request.CurrentRound)
