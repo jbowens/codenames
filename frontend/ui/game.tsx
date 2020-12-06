@@ -148,20 +148,18 @@ export class Game extends React.Component {
         state_id: state_id,
       })
       .then(({ data }) => {
-        this.setState(
-          (oldState) => {
-            const stateToUpdate = { game: data };
-            if (oldState.game && data.created_at != oldState.game.created_at) {
-              stateToUpdate.codemaster = false;
-            }
-            return stateToUpdate;
-          },
-          () => {
-            setTimeout(() => {
-              this.refresh();
-            }, 2000);
+        this.setState((oldState) => {
+          const stateToUpdate = { game: data };
+          if (oldState.game && data.created_at != oldState.game.created_at) {
+            stateToUpdate.codemaster = false;
           }
-        );
+          return stateToUpdate;
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          this.refresh();
+        }, 2000);
       });
   }
 
