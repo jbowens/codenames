@@ -125,10 +125,7 @@ func (gh *GameHandle) MarshalJSON() ([]byte, error) {
 func (s *Server) getGame(gameID string) *GameHandle {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.getGameLocked(gameID)
-}
 
-func (s *Server) getGameLocked(gameID string) *GameHandle {
 	gh, ok := s.games[gameID]
 	if ok {
 		return gh
@@ -150,9 +147,7 @@ func (s *Server) handleGameState(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s.mu.Lock()
-	gh := s.getGameLocked(body.GameID)
-	s.mu.Unlock()
+	gh := s.getGame(body.GameID)
 
 	updated, replaced := gh.gameStateChanged(body.StateID)
 
