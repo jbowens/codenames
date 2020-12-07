@@ -36,7 +36,7 @@ npm run build
 
 ### Docker
 
-Alternatively, the reposotiry includes a Dockerfile for building a docker image of this app.
+Alternatively, the repository includes a Dockerfile for building a docker image of this app.
 
 ```
 docker build . -t codenames:latest
