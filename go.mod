@@ -4,13 +4,15 @@ go 1.13
 
 require (
 	github.com/certifi/gocertifi v0.0.0-20200211180108-c7c1fbc02894 // indirect
-	github.com/cockroachdb/pebble v0.0.0-20201113231719-11399317ed18
+	github.com/cockroachdb/errors v1.8.2 // indirect
+	github.com/cockroachdb/pebble v0.0.0-20201230164344-95e53b0ff513
+	github.com/cockroachdb/redact v1.0.9 // indirect
 	github.com/getsentry/raven-go v0.2.0 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/jbowens/dictionary v0.0.0-20160629041621-229cf68df1a6
 	github.com/kr/pretty v0.2.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1
-	golang.org/x/exp v0.0.0-20201008143054-e3b2a7f2fdc7 // indirect
-	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634 // indirect
+	golang.org/x/exp v0.0.0-20201229011636-eab1b5eb1a03 // indirect
+	golang.org/x/sys v0.0.0-20201231184435-2d18734c6014 // indirect
 )
