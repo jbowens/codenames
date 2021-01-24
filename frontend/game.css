@@ -117,8 +117,8 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 19%;
-  height: 18%;
+  width: 18%;
+  height: 17%;
 }
 
 .cell.disabled {
@@ -156,6 +156,7 @@
 }
 .codemaster .black.hidden-word {
   background: #999;
+  outline: 4px solid #000000;
 }
 .codemaster .cell {
   font-weight: bold;
@@ -197,23 +198,23 @@
 
 .color-blind .blue-remaining,
 .color-blind #status-line.blue #status {
-  border: 2px solid #4183cc;
+  border: 4px solid #4183cc;
 }
 
 .color-blind .red-remaining,
 .color-blind #status-line.red #status {
-  border: 2px dashed #d13030;
+  border: 4px dashed #d13030;
 }
 
 .color-blind.codemaster .red.hidden-word,
 .color-blind .red.revealed {
-  outline: 2px dashed #d13030;
+  outline: 4px dashed #d13030;
   border: 1px solid white;
 }
 
 .color-blind.codemaster .blue.hidden-word,
 .color-blind .blue.revealed {
-  outline: 2px solid #4183cc;
+  outline: 4px solid #4183cc;
   border: 1px solid white;
 }
 
@@ -242,6 +243,7 @@
 }
 .dark-mode .codemaster .black.hidden-word {
   background: #444;
+  outline: 4px solid #000000;
 }
 
 .dark-mode #end-turn-btn,
