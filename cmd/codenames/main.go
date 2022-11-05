@@ -62,6 +62,10 @@ func main() {
 	var opts pebble.Options
 	opts.EventListener = pebble.MakeLoggingEventListener(nil)
 	opts.Experimental.DeleteRangeFlushDelay = 5 * time.Second
+	opts.FormatMajorVersion = pebble.FormatMarkedCompacted
+	opts.Levels = []pebble.LevelOptions{
+		{BlockSize: 256 << 10, BlockRestartInterval: 256},
+	}
 	db, err := pebble.Open(dir, &opts)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "pebble.Open: %s\n", err)
@@ -82,7 +86,7 @@ func main() {
 	// Restore games from disk.
 	games, err := ps.Restore()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "PebbleStore.Resore: %s\n", err)
+		fmt.Fprintf(os.Stderr, "PebbleStore.Restore: %s\n", err)
 		os.Exit(1)
 	}
 	log.Printf("[STARTUP] Restored %d games from disk.\n", len(games))

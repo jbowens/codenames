@@ -90,7 +90,7 @@ func (ps *PebbleStore) Checkpoint(w io.Writer) error {
 	// tends to be a significant number of obsolete keys, so this shouldn't be
 	// too expensive but will reduce the number of bytes we need to send over
 	// the network.
-	err := ps.DB.Compact([]byte{}, []byte{0xFF, 0xFF, 0xFF, 0xFF})
+	err := ps.DB.Compact([]byte{}, []byte{0xFF, 0xFF, 0xFF, 0xFF}, true /* parallel */)
 	if err != nil {
 		return err
 	}
