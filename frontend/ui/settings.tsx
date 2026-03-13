@@ -34,10 +34,14 @@ export class Settings {
   static load() {
     try {
       const settingsBlob = localStorage.getItem('settings');
-      return JSON.parse(settingsBlob) || {};
+      const settings = JSON.parse(settingsBlob) || {};
+      if (settings.strawberryMode === undefined) {
+        settings.strawberryMode = true;
+      }
+      return settings;
     } catch (e) {
       console.error(e);
-      return {};
+      return { strawberryMode: true };
     }
   }
 
