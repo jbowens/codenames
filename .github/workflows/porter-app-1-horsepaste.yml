@@ -1,7 +1,7 @@
 "on":
     push:
         branches:
-            - master
+            - staging
 name: Deploy to horsepaste
 jobs:
     porter-deploy:
