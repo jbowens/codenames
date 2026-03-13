@@ -19,6 +19,11 @@ const settingToggles = [
     desc: 'Darken the mood.',
   },
   {
+    name: 'Strawberry',
+    setting: 'strawberryMode',
+    desc: 'Pink and sweet.',
+  },
+  {
     name: 'Clue giver may guess',
     setting: 'cluegiverMayGuess',
     desc: 'When enabled, clicking a word from clue giver view reveals the word.',

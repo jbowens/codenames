@@ -29,6 +29,9 @@ export class Game extends React.Component {
     if (this.state.settings.darkMode) {
       classes += ' dark-mode';
     }
+    if (this.state.settings.strawberryMode) {
+      classes += ' strawberry-mode';
+    }
     if (this.state.settings.fullscreen) {
       classes += ' full-screen';
     }
@@ -65,6 +68,12 @@ export class Game extends React.Component {
     }
     if (prevState?.settings.darkMode && !this.state.settings.darkMode) {
       document.body.classList.remove('dark-mode');
+    }
+    if (!prevState?.settings.strawberryMode && this.state.settings.strawberryMode) {
+      document.body.classList.add('strawberry-mode');
+    }
+    if (prevState?.settings.strawberryMode && !this.state.settings.strawberryMode) {
+      document.body.classList.remove('strawberry-mode');
     }
   }
 

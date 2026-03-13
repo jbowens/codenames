@@ -159,6 +159,48 @@ p.intro {
   color: #333;
 }
 
+/* Strawberry mode - lobby */
+.strawberry-mode #topbar a {
+  color: #c43c6e;
+}
+.strawberry-mode #new-game input#game-name {
+  background: #fff0f3;
+  border: 1px #f48fb1 solid;
+  border-right: none;
+  color: #880e4f;
+}
+.strawberry-mode #new-game button {
+  background: #f8bbd0;
+  border: 1px #f48fb1 solid;
+  color: #880e4f;
+}
+.strawberry-mode #wordsets .instruction {
+  color: #c43c6e;
+}
+.strawberry-mode .btn-wordsettoggle {
+  border: 1px #f48fb1 solid;
+  color: #880e4f;
+}
+.strawberry-mode #wordsets .selected {
+  background: #f8bbd0;
+  border: 1px #e91e63 solid;
+}
+.strawberry-mode .btn-custom-word-set {
+  border-top: 1px #f48fb1 solid;
+}
+.strawberry-mode #banner {
+  background: #fce4ec;
+  color: #880e4f;
+}
+.strawberry-mode #banner a {
+  color: #c43c6e;
+}
+.strawberry-mode #new-game-options textarea {
+  background: #fff0f3;
+  border: 1px #f48fb1 solid;
+  color: #880e4f;
+}
+
 .dropdown-label {
   display: flex;
 }

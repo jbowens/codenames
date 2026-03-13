@@ -264,6 +264,96 @@
   color: #eee;
 }
 
+/* Strawberry mode */
+.strawberry-mode {
+  background: #fff0f3;
+}
+.strawberry-mode h1 {
+  color: #c43c6e;
+}
+.strawberry-mode .cell {
+  background: #fce4ec;
+}
+.strawberry-mode .board .neutral.revealed {
+  background: #f8d0d8;
+}
+.strawberry-mode .cluegiver .red.hidden-word {
+  color: #e91e63;
+}
+.strawberry-mode .cluegiver .blue.hidden-word {
+  color: #ad1457;
+}
+.strawberry-mode .cluegiver .red.revealed,
+.strawberry-mode .cluegiver .blue.revealed {
+  color: #fff;
+}
+.strawberry-mode .cluegiver .black.hidden-word {
+  background: #880e4f;
+  outline: 4px solid #4a0028;
+}
+.strawberry-mode .board .red.revealed {
+  background: #e91e63;
+  color: #fff;
+}
+.strawberry-mode .board .blue.revealed {
+  background: #ad1457;
+  color: #fff;
+}
+.strawberry-mode .board .black.revealed {
+  background: #4a0028;
+  color: #fff;
+}
+.strawberry-mode #end-turn-btn,
+.strawberry-mode #mode-toggle button {
+  background: #fce4ec;
+  border: 1px #f48fb1 solid;
+  color: #880e4f;
+}
+.strawberry-mode #mode-toggle button.gear {
+  background-color: transparent;
+  border: none;
+}
+.strawberry-mode #remaining {
+  color: #880e4f;
+}
+.strawberry-mode #timer {
+  color: #c43c6e;
+}
+.strawberry-mode #infoContent {
+  border-bottom: 1px #f8bbd0 solid;
+}
+.strawberry-mode #share,
+.strawberry-mode #share .url {
+  color: #e91e63;
+}
+.strawberry-mode .red-turn .status-text {
+  color: #e91e63;
+}
+.strawberry-mode .blue-turn .status-text {
+  color: #ad1457;
+}
+.strawberry-mode #remaining .red-remaining {
+  color: #e91e63;
+}
+.strawberry-mode #remaining .blue-remaining {
+  color: #ad1457;
+}
+.strawberry-mode #coffee a {
+  color: #f48fb1;
+}
+.strawberry-mode .settings {
+  background-color: #fff0f3;
+}
+.strawberry-mode .toggle {
+  background-color: #fce4ec;
+}
+.strawberry-mode .toggle.active {
+  background-color: #f8bbd0;
+}
+.strawberry-mode .settings-desc {
+  color: #c43c6e;
+}
+
 #game-view.full-screen {
   width: 98vw;
 }
