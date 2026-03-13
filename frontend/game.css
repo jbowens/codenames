@@ -289,7 +289,7 @@
   color: #e91e63;
 }
 .strawberry-mode .cluegiver .blue.hidden-word {
-  color: #ad1457;
+  color: #7b1fa2;
 }
 .strawberry-mode .cluegiver .red.revealed,
 .strawberry-mode .cluegiver .blue.revealed {
@@ -304,7 +304,7 @@
   color: #fff;
 }
 .strawberry-mode .board .blue.revealed {
-  background: #ad1457;
+  background: #9c27b0;
   color: #fff;
 }
 .strawberry-mode .board .black.revealed {
@@ -338,13 +338,13 @@
   color: #e91e63;
 }
 .strawberry-mode .blue-turn .status-text {
-  color: #ad1457;
+  color: #7b1fa2;
 }
 .strawberry-mode #remaining .red-remaining {
   color: #e91e63;
 }
 .strawberry-mode #remaining .blue-remaining {
-  color: #ad1457;
+  color: #7b1fa2;
 }
 .strawberry-mode #coffee a {
   color: #f48fb1;
