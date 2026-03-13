@@ -271,6 +271,14 @@
 .strawberry-mode h1 {
   color: #c43c6e;
 }
+.strawberry-mode h1 a {
+  font-size: 0;
+}
+.strawberry-mode h1 a::after {
+  content: 'Strawberrypaste';
+  font-size: 1rem;
+  color: #c43c6e;
+}
 .strawberry-mode .cell {
   background: #fce4ec;
 }
